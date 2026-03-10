@@ -11,14 +11,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace AdivinaQuienServidor.Views
+namespace AdivinaQuienCliente.ViewModels
 {
     /// <summary>
-    /// Lógica de interacción para UserControl1.xaml
+    /// Lógica de interacción para TableroView.xaml
     /// </summary>
-    public partial class UserControl1 : UserControl
+    public partial class TableroView : UserControl
     {
-        public UserControl1()
+        public TableroView()
         {
             InitializeComponent();
         }
