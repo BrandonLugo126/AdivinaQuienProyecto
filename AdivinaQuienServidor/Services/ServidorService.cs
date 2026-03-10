@@ -11,10 +11,12 @@ namespace AdivinaQuienServidor.Services
     public class ServidorService
     {
         private TcpListener? Servidor { get; set; }
-        public List<Personaje> Personajes { get; set; } = new List<Personaje>();
-        public List<string> HistoriaPyR { get; set; } = new List<string>();
+        public List<Personaje> Personajes { get; set; } = new();
 
-        public string Personaje1 { get; set; } = null!;
+        
+        public List<string> HistorialPyR { get; set; } = new List<string>();
+
+        public string Personaje1 { get; set; } = null!; // Por defecto siempre va a hacer el del servidor
         public string Personaje2 { get; set; } = null!;
         public string NickPersonaje1 { get; set; } = null!; //Nombre del servidor que pordefecto tendra el turno y personaje #1
         public string NickPersonaje2 { get; set; } = null!;
@@ -28,7 +30,7 @@ namespace AdivinaQuienServidor.Services
         {
             if (juegoIniciado == false)
             {
-                juegoIniciado = true;               
+                juegoIniciado = true;
                 Thread Hilo = new Thread(RecibirJugador2); //Hilo para recibir al jugador 2 y comenzar el juego
                 Hilo.IsBackground = true;
                 Hilo.Start();
