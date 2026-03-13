@@ -12,20 +12,29 @@ namespace AdivinaQuienServidor.Services
     {
         private TcpListener? Servidor { get; set; }
         public List<Personaje> Personajes { get; set; } = new();
-
-        
         public List<string> HistorialPyR { get; set; } = new List<string>();
 
-        public string Personaje1 { get; set; } = null!; // Por defecto siempre va a hacer el del servidor
-        public string Personaje2 { get; set; } = null!;
-        public string NickPersonaje1 { get; set; } = null!; //Nombre del servidor que pordefecto tendra el turno y personaje #1
-        public string NickPersonaje2 { get; set; } = null!;
+
+        public string? Personaje1 { get; set; } // Por defecto siempre va a hacer el del servidor
+        public string? Personaje2 { get; set; } 
+        public string? NickServidor { get; set; }  //Nombre del servidor que pordefecto tendra el turno y personaje #1
+        public string? NickPersonaje2 { get; set; } 
+        public string? Turno { get; set; } 
+        public Cliente? ConexionJ2 { get; set; }
 
         int puerto = 5000;
         bool juegoIniciado = false;
+        bool Jugador2Conectado = false;
+        public bool EnTurno;
         public string Pregunta { get; set; } = null!;
         public string Respuesta { get; set; } = null!;
 
+        public event Action? JugadorConectado; // Evento para notificar que el jugador se ha conectado
+        public event Action<string>? ChatActualizado; // Evento para notificar que el chat se ha actualizado
+        public event Action<string>? TurnoCambiado; // Evento para notificar que el turno ha cambiado
+        public event Action? JuegoListoParaIniciar; // Evento para notificar que el juego está listo para iniciar
+        public event Action<string>? PartidaTerminada; // Evento para notificar que la partida ha terminado
+        public event Action<string>? LogActualizado;
         public void AbrirSala()
         {
             if (juegoIniciado == false)
@@ -36,30 +45,144 @@ namespace AdivinaQuienServidor.Services
                 Hilo.Start();
             }
         }
-
-        private void RecibirJugador2(object? obj)
+        public void SeleccionarPersonajeServidor(string personaje)
         {
-            IPEndPoint Ipserver = new(IPAddress.Any, puerto);
-            Servidor = new(Ipserver);
-            try
+            if (Jugador2Conectado == true && Personaje1== null && ConexionJ2!=null) 
             {
-                var clieneNuevo = Servidor.AcceptTcpClient();
-                var stream = clieneNuevo.GetStream();
-
-                byte[] buffer = new byte[clieneNuevo.Available];
-                var json = Encoding.UTF8.GetString(buffer);
-                var ConectarCommand = JsonSerializer.Deserialize<ConectarCommando>(json);
-                if (ConectarCommand != null)
+                Personaje1 = personaje;
+                var comando = new TerminarTurnoCommando()
                 {
-                    Personaje2 = ConectarCommand.Personaje;
-                    NickPersonaje2 = ConectarCommand.Nombre;
+                    Comamando = Orden.TerminarTurno,
+                    JugadorTurno = ConexionJ2.Nombre
+
+                };
+                EnviarComando(ConexionJ2.Conexion, comando);
+                TurnoCambiado?.Invoke(ConexionJ2.Nombre);
+            }
+        }
+        private void EnviarPregunta(string Pregunta)
+        {
+            if (Jugador2Conectado && ConexionJ2!=null)
+            {
+                if (Turno == NickServidor && !string.IsNullOrWhiteSpace(Pregunta))
+                {
+                    HistorialPyR.Add($"{NickServidor}: {Pregunta}");
+                    var comando = new PreguntaCommando()
+                    {
+                        Comamando = Orden.Preguntar,
+                        Pregunta = Pregunta
+                    };
+                    ChatActualizado?.Invoke($"{NickServidor}: {Pregunta}");
+                }
+                else { 
+                    LogActualizado?.Invoke("No es tu turno para hacer una pregunta.");
                 }
             }
-            catch (Exception)
-            {
+        }
 
-                throw;
+        public void TerminarTurno() 
+        {
+            if (Turno != NickServidor)
+            {
+                LogActualizado?.Invoke("No es tu turno para terminarlo.");
+                return;
             }
+            Turno = NickPersonaje2;
+            TurnoCambiado?.Invoke(Turno!);
+            var Commando = new TerminarTurnoCommando()
+            {
+                Comamando = Orden.TerminarTurno,
+                JugadorTurno = Turno??""
+            };
+            EnviarComando(ConexionJ2.Conexion, Commando);
+            EnTurno= false;
+        }
+        private void RecibirJugador2(object? obj)
+        {
+
+            IPEndPoint Ipserver = new(IPAddress.Any, puerto);
+            Servidor = new(Ipserver);
+            Servidor.Start();
+            while (true)
+            {
+                try
+                {
+                    var clieneNuevo = Servidor.AcceptTcpClient();
+                    var stream = clieneNuevo.GetStream();
+                    byte[] buffer = new byte[clieneNuevo.Available];
+                    stream.ReadExactly(buffer, 0, buffer.Length);
+                    var json = Encoding.UTF8.GetString(buffer);
+                    var ConectarCommand = JsonSerializer.Deserialize<ConectarCommando>(json);
+                    if (ConectarCommand != null)
+                    {                        
+                        NickPersonaje2 = ConectarCommand.Nombre;
+
+                        Cliente cliente = new Cliente()
+                        {
+                            Conexion = clieneNuevo,
+                            Nombre = ConectarCommand.Nombre
+                        };
+                        NickPersonaje2 = ConectarCommand.Nombre;
+                        JugadorConectado?.Invoke();
+                        Thread Hilo = new Thread(EscucharCliente);
+                        Hilo.IsBackground = true;
+                        Hilo.Start();
+                    }
+
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+        private void EscucharCliente(object? c)
+        {
+            if (c != null)
+            {
+                TcpClient cliente = (TcpClient)c;
+
+                try
+                {
+                    while (cliente.Connected)
+                    {
+                        if (cliente.Available > 0)
+                        {
+                            var stream = cliente.GetStream();
+                            byte[] Buffer = new byte[cliente.Available];
+                            stream.ReadExactly(Buffer, 0, Buffer.Length);
+                            var json = Encoding.UTF8.GetString(Buffer);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+
+        }
+        public void IniciarJuego()
+        {
+            juegoIniciado = true;
+            if (juegoIniciado== true && Personaje1==null)
+            {
+                if (NickServidor != null)
+                {
+                    Turno = NickServidor;
+                    
+                }
+                
+            }
+        }   
+        public void EnviarComando(TcpClient cliente, object comando)
+        {
+            var stream = cliente.GetStream();
+            var json = JsonSerializer.Serialize(comando);
+            byte[] buffer = Encoding.UTF8.GetBytes(json);
+            stream.Write(buffer, 0, buffer.Length);
         }
     }
 }
