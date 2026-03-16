@@ -35,6 +35,11 @@ namespace AdivinaQuienServidor.Services
         public event Action? JuegoListoParaIniciar; // Evento para notificar que el juego está listo para iniciar
         public event Action<string>? PartidaTerminada; // Evento para notificar que la partida ha terminado
         public event Action<string>? LogActualizado;//Solo para pruebas para saber que se estan recibiendo los comandos correctamente
+
+        public ServidorService()
+        {
+            AbrirSala();
+        }
         public void AbrirSala()
         {
             if (juegoIniciado == false)
