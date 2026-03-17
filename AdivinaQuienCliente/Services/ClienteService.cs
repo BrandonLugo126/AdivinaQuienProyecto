@@ -21,6 +21,7 @@ namespace AdivinaQuienCliente.Services
         public IPAddress? IP { get; set; }
 
         public event Action? JugadorConectado;
+        public bool Enturno;
 
         public void ConectarAlServidor(IPAddress IP, string nombre)
         
@@ -48,7 +49,13 @@ namespace AdivinaQuienCliente.Services
                 }
             }
         }
+        public void SeleccionarPersonaje(string personaje)
+        {
+            if (Enturno==true)
+            {
 
+            }
+        }
         private void EscucharServidor(object? obj)
         {
             if (cliente!=null)
@@ -72,6 +79,7 @@ namespace AdivinaQuienCliente.Services
                                         JugadorConectado?.Invoke();
                                         break;
                                     case Orden.SeleccionarPersonaje:
+                                        
                                         break;
                                     case Orden.EsperarRespuesta:
                                         break;

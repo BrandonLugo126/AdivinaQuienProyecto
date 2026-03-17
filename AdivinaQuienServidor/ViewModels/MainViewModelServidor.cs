@@ -19,6 +19,7 @@ namespace AdivinaQuienServidor.ViewModels
     {
         private TipoVista _vistaActual = TipoVista.Inicio;
         ServidorService service = new();
+        public string NombreServidor { get; set; } 
         public TipoVista VistaActual
         {
             get => _vistaActual;
@@ -38,7 +39,7 @@ namespace AdivinaQuienServidor.ViewModels
         private void IrASala()
         {
             VistaActual = TipoVista.SalaEspera;
-            service.AbrirSala();
+            service.AbrirSala(NombreServidor);
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)

@@ -9,32 +9,26 @@
     <Grid Margin="30">
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="400">
 
-            <TextBlock Text="SALA DE ESPERA" 
+            <TextBlock Text="Adivina Quien" 
                    FontSize="24" 
                    FontWeight="Bold" 
                    Foreground="#2C3E50" 
                    HorizontalAlignment="Center" 
                    Margin="0,0,0,5"/>
 
-          
-            
-            <TextBlock Text="JUGADORES EN ESPERA (MAX 2)" FontSize="11" FontWeight="Bold" Foreground="#34495E" Margin="5,0,0,8"/>
 
-            <Border Background="#F4F6F7" CornerRadius="10" Padding="15" MinHeight="150">
-                <ItemsControl ItemsSource="{Binding ListaClientes}">
-                    <Border Background="White" CornerRadius="5" Padding="10" Margin="0,0,0,5">
-                        <Grid>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="💻" Margin="0,0,10,0"/>
-                                <TextBlock Text="Cliente_1 (192.168.1.5)" FontSize="12" Foreground="#2C3E50"/>
-                            </StackPanel>
-                            <TextBlock Text="CONECTADO" HorizontalAlignment="Right" Foreground="#27AE60" FontSize="9" FontWeight="Bold"/>
-                        </Grid>
-                    </Border>
-                </ItemsControl>
+
+
+            <Border Background="#F4F6F7" CornerRadius="10" Padding="15" MinHeight="60">
+
+                <Grid ColumnDefinitions="auto,*">
+                    <TextBlock Text="Nombre:" Foreground="Black"  Grid.Column="0" HorizontalAlignment="Center" Padding="10"/>
+                    <TextBox Grid.Column="1" Text="{Binding NombreServidor}" Foreground="#2C3E50" />
+
+                </Grid>
             </Border>
 
-            <Button Content="INICIAR PARTIDA" 
+            <Button Content="Abrir Sala" 
                 Command="{Binding IniciarPartidaCommand}"
                 Height="50"
                 Background="#27AE60" 
