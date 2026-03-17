@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:AdivinaQuienCliente.Views"
+             xmlns:local="clr-namespace:AdivinaQuienCliente.Views" xmlns:viewmodels="clr-namespace:AdivinaQuienCliente.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModelCliente}"
              mc:Ignorable="d" 
              Height="450" Width="800">
     <Grid Background="#1A000000">
@@ -63,19 +63,37 @@
                        HorizontalAlignment="Center" 
                        Margin="0,0,0,25"/>
 
-                <Button Content="VOLVER A LA SALA" 
-                    Command="{Binding VolverASalaCommand}"
-                    Background="#2C3E50" 
-                    Foreground="White" 
-                    FontWeight="Bold" 
-                    Height="45"
-                    Cursor="Hand">
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="8"/>
-                        </Style>
-                    </Button.Resources>
-                </Button>
+                <StackPanel  HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Button Margin="10" Padding="10" Content="VOLVER A JUGAR" 
+               Command="{Binding IrASalaCommand}"
+               Background="#2C3E50" 
+               Foreground="White" 
+               FontWeight="Bold" 
+               Height="45"
+               Cursor="Hand">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="8"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+
+                    <Button Margin="10" Padding="10" Content="NUEVA PARTIDA" 
+               Command="{Binding VolverAConexionCommand}"
+               Background="#2C3E50" 
+               Foreground="White" 
+               FontWeight="Bold" 
+               Height="45"
+               Cursor="Hand">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="8"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </StackPanel>
+
+
 
             </StackPanel>
         </Border>

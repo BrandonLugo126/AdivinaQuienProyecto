@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:AdivinaQuienCliente.ViewModels"
+             xmlns:local="clr-namespace:AdivinaQuienCliente.Views" xmlns:viewmodels="clr-namespace:AdivinaQuienCliente.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModelCliente}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -14,10 +14,12 @@
             <TextBlock Text="Dirección IP del Servidor:" Margin="0,5"/>
             <TextBox  Padding="5" Margin="0,0,0,15" Text="127.0.0.1" />
 
-            <TextBlock Text="Puerto:" Margin="0,5"/>
+            <TextBlock Text="Nombre:" Margin="0,5"/>
             <TextBox Padding="5" Margin="0,0,0,25" Text="8888"/>
 
-            <Button Content="CONECTARSE" 
+            <Button
+                Command="{Binding IrASalaCommand}"
+                Content="CONECTARSE" 
               Background="#27AE60" Foreground="White" 
               FontWeight="Bold" Height="40"
               Cursor="Hand">

@@ -3,10 +3,42 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AdivinaQuienCliente"
+        xmlns:local="clr-namespace:AdivinaQuienCliente.Views"
+        xmlns:viewmodels="clr-namespace:AdivinaQuienCliente.ViewModels"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+
+    <Window.DataContext>
+        <viewmodels:MainViewModelCliente/>
+    </Window.DataContext>
+
     <Grid>
 
+        <Grid.Resources>
+            <viewmodels:ConexionView x:Key="VistaConexion"></viewmodels:ConexionView>
+            <local:SalaEsperaView x:Key="VistaSala"></local:SalaEsperaView>
+        </Grid.Resources>
+
+        <ContentControl>
+            <ContentControl.Style>
+                <Style TargetType="ContentControl">
+                   <Style.Triggers>
+                        <DataTrigger Binding="{Binding VistaActual}" Value="{x:Static viewmodels:TipoVista.Conexion}">
+                            <Setter Property="Content" Value="{StaticResource VistaConexion}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding VistaActual}" Value="{x:Static viewmodels:TipoVista.SalaEspera}">
+                            <Setter Property="Content" Value="{StaticResource VistaSala}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
+
+
     </Grid>
+
+    
+    
+
+       
 </Window>

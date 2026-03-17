@@ -1,5 +1,6 @@
 ﻿using AdivinaQuienServidor.Models;
-using CommunityToolkit.Mvvm.Input;
+
+using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
 using System.Net;
