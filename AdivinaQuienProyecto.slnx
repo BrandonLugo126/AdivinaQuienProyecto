@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="AdivinaQuienCliente/AdivinaQuienCliente.csproj" />
+  <Project Path="AdivinaQuienServidor/AdivinaQuienServidor.csproj" />
+</Solution>
