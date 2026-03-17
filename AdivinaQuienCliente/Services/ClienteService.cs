@@ -22,6 +22,7 @@ namespace AdivinaQuienCliente.Services
 
         public event Action? JugadorConectado;
         public bool Enturno;
+        public List<Personaje> Personajes = new List<Personaje>();
 
         public void ConectarAlServidor(IPAddress IP, string nombre)
         
