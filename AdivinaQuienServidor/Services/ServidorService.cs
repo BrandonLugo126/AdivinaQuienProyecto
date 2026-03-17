@@ -138,12 +138,12 @@ namespace AdivinaQuienServidor.Services
                     ChatActualizado?.Invoke($"{NickServidor} ha intentado adivinar y ha fallado. El turno pasa a {NickPersonaje2}.");
                 }
             }
-        }        
-        private void RecibirJugador2(object? obj)
+        }
+        private void RecibirJugador2()
         {
 
             IPEndPoint Ipserver = new(IPAddress.Any, puerto);
-            Servidor = new TcpListener(Ipserver);
+            Servidor = new(Ipserver);
             Servidor.Start();
             while (true)
             {
@@ -196,7 +196,7 @@ namespace AdivinaQuienServidor.Services
                             byte[] Buffer = new byte[cliente.Available];
                             stream.ReadExactly(Buffer, 0, Buffer.Length);
                             var json = Encoding.UTF8.GetString(Buffer);
-                         
+
                         }
                     }
                 }
