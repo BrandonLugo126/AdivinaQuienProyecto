@@ -3,10 +3,32 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AdivinaQuienServidor"
-        mc:Ignorable="d"
+        xmlns:local="clr-namespace:AdivinaQuienServidor" xmlns:views="clr-namespace:AdivinaQuienServidor.Views"
+        mc:Ignorable="d" xmlns:vm="clr-namespace:AdivinaQuienServidor.ViewModels"
         Title="MainWindow" Height="450" Width="800">
+    <Window.DataContext>
+        <vm:MainViewModelServidor/>
+    </Window.DataContext>
     <Grid>
+
+        <Grid.Resources>
+            <views:SalaEsperaView x:Key="Sala"></views:SalaEsperaView>
+            <views:InicioView x:Key="Inicio"></views:InicioView>
+        </Grid.Resources>
+        <ContentControl>
+            <ContentControl.Style>
+                <Style TargetType="ContentControl">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding VistaActual}" Value="{x:Static vm:TipoVista.Inicio}">
+                            <Setter Property="Content" Value="{StaticResource Inicio}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding VistaActual}" Value="{x:Static vm:TipoVista.SalaEspera}">
+                            <Setter Property="Content" Value="{StaticResource Sala}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
 
     </Grid>
 </Window>

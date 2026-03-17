@@ -14,8 +14,6 @@ namespace AdivinaQuienCliente.ViewModels
     {
         Conexion,
         SalaEspera,
-
-
     }
     public class MainViewModelCliente : INotifyPropertyChanged
     {
@@ -23,7 +21,7 @@ namespace AdivinaQuienCliente.ViewModels
         ClienteService Service = new();
 
         public string Nombre { get; set; }
-        public IPAddress? Ip { get; set; }
+        public string Ip { get; set; } = "127.0.0.1";
         public TipoVista VistaActual
         {
             get => _vistaActual;
@@ -48,7 +46,7 @@ namespace AdivinaQuienCliente.ViewModels
         private void IrASala()
         {
             VistaActual = TipoVista.SalaEspera;
-            Service.ConectarAlServidor(Ip, Nombre);
+            Service.ConectarAlServidor(IPAddress.Parse(Ip), Nombre);
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)

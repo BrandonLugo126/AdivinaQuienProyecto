@@ -36,10 +36,6 @@ namespace AdivinaQuienServidor.Services
         public event Action<string>? PartidaTerminada; // Evento para notificar que la partida ha terminado
         public event Action<string>? LogActualizado;//Solo para pruebas para saber que se estan recibiendo los comandos correctamente
 
-        public ServidorService()
-        {
-            AbrirSala();
-        }
         public void AbrirSala()
         {
             if (juegoIniciado == false)
@@ -150,11 +146,15 @@ namespace AdivinaQuienServidor.Services
                 try
                 {
                     var clieneNuevo = Servidor.AcceptTcpClient();
+                    Thread.Sleep(100);                    
                     var stream = clieneNuevo.GetStream();
-                    byte[] buffer = new byte[clieneNuevo.Available];
-                    stream.ReadExactly(buffer, 0, buffer.Length);
-                    var json = Encoding.UTF8.GetString(buffer);
+                    byte[] buffer = new byte[1024];
+                    int bytes = stream.Read(buffer, 0, buffer.Length);
+                    var json = Encoding.UTF8.GetString(buffer,0,bytes);
+
                     var ConectarCommand = JsonSerializer.Deserialize<ConectarCommando>(json);
+
+
                     if (ConectarCommand != null)
                     {
                         NickPersonaje2 = ConectarCommand.Nombre;

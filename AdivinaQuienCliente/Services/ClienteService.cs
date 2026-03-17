@@ -23,6 +23,7 @@ namespace AdivinaQuienCliente.Services
         public event Action? JugadorConectado;
 
         public void ConectarAlServidor(IPAddress IP, string nombre)
+        
         {
 
             if (cliente == null)
@@ -37,7 +38,7 @@ namespace AdivinaQuienCliente.Services
                     var comando = new ConectarCommando
                     {
                         Comamando = Orden.Conectar,
-                        Nombre = Nick ?? ""
+                        Nombre = nombre
                     };
                     Thread hilo = new Thread(EscucharServidor);
                     hilo.IsBackground = true;
