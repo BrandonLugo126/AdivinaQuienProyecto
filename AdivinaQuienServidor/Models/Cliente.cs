@@ -7,7 +7,7 @@ namespace AdivinaQuienServidor.Models
 {
     public class Cliente
     {
-        public TcpClient Conexion { get; set; } = null!;
+        public TcpClient? Conexion { get; set; }
         public string Nombre { get; set; } = null!;
     }
 }

@@ -20,7 +20,7 @@ namespace AdivinaQuienServidor.Services
         public string? NickServidor { get; set; }  //Nombre del servidor que pordefecto tendra el turno y personaje #1
         public string? NickPersonaje2 { get; set; }
         public string? Turno { get; set; }
-        public Cliente? ConexionJ2 { get; set; }
+        public TcpClient ConexionJ2 { get; set; } = null!;
 
         int puerto = 5000;
         bool juegoIniciado = false;
@@ -36,11 +36,12 @@ namespace AdivinaQuienServidor.Services
         public event Action<string>? PartidaTerminada; // Evento para notificar que la partida ha terminado
         public event Action<string>? LogActualizado;//Solo para pruebas para saber que se estan recibiendo los comandos correctamente
 
-        public void AbrirSala()
+        public void AbrirSala(string nombre)
         {
             if (juegoIniciado == false)
             {
                 juegoIniciado = true;
+                NickServidor = nombre;
                 Thread Hilo = new Thread(RecibirJugador2); //Hilo para recibir al jugador 2 y comenzar el juego
                 Hilo.IsBackground = true;
                 Hilo.Start();
@@ -51,14 +52,17 @@ namespace AdivinaQuienServidor.Services
             if (Jugador2Conectado == true && Personaje1 == null && ConexionJ2 != null)
             {
                 Personaje1 = personaje;
-                var comando = new TerminarTurnoCommando()
+                if (NickPersonaje2 != null)
                 {
-                    Comamando = Orden.TerminarTurno,
-                    JugadorTurno = ConexionJ2.Nombre
+                    var comando = new TerminarTurnoCommando()
+                    {
+                        Comamando = Orden.TerminarTurno,
+                        JugadorTurno = NickPersonaje2
 
-                };
-                EnviarComando(ConexionJ2.Conexion, comando);
-                TurnoCambiado?.Invoke(ConexionJ2.Nombre);
+                    };
+                    EnviarComando(ConexionJ2, comando);
+                    TurnoCambiado?.Invoke(NickPersonaje2);
+                }
             }
         }
         private void EnviarPregunta(string Pregunta)
@@ -73,7 +77,7 @@ namespace AdivinaQuienServidor.Services
                         Comamando = Orden.Preguntar,
                         Pregunta = Pregunta
                     };
-                    EnviarComando(ConexionJ2.Conexion, comando);
+                    EnviarComando(ConexionJ2, comando);
                     ChatActualizado?.Invoke($"{NickServidor}: {Pregunta}");
                 }
                 else
@@ -90,6 +94,7 @@ namespace AdivinaQuienServidor.Services
                 LogActualizado?.Invoke("No es tu turno para terminarlo.");
                 return;
             }
+
             Turno = NickPersonaje2;
             TurnoCambiado?.Invoke(Turno!);
             var Commando = new TerminarTurnoCommando()
@@ -97,8 +102,9 @@ namespace AdivinaQuienServidor.Services
                 Comamando = Orden.TerminarTurno,
                 JugadorTurno = Turno ?? ""
             };
-            EnviarComando(ConexionJ2.Conexion, Commando);
+            EnviarComando(ConexionJ2, Commando);
             EnTurno = false;
+
         }
 
         public void IntentarAdivinar(string personaje)
@@ -119,7 +125,7 @@ namespace AdivinaQuienServidor.Services
                         PersonajeJ1 = Personaje1 ?? "",
                         PersonajeJ2 = Personaje2 ?? ""
                     };
-                    EnviarComando(ConexionJ2.Conexion, comando);
+                    EnviarComando(ConexionJ2, comando);
                     PartidaTerminada?.Invoke($"¡{NickServidor} ha ganado! El personaje de {NickServidor} era {Personaje1} y el de {NickPersonaje2} era {Personaje2}.");
                 }
                 else
@@ -129,16 +135,31 @@ namespace AdivinaQuienServidor.Services
                         Comamando = Orden.TerminarTurno,
                         JugadorTurno = NickPersonaje2 ?? ""
                     };
-                    EnviarComando(ConexionJ2.Conexion, comando);
+                    EnviarComando(ConexionJ2, comando);
                     TurnoCambiado?.Invoke(NickPersonaje2 ?? "");
                     ChatActualizado?.Invoke($"{NickServidor} ha intentado adivinar y ha fallado. El turno pasa a {NickPersonaje2}.");
                 }
             }
         }
+
+        public void ProcesarRespuesta(bool respuesta)
+        {
+            string Respues = respuesta? "Si":"No";
+            ChatActualizado?.Invoke($"{Turno}:{Respues}");
+            var commando = new RespuestaCommando()
+            {
+                Comamando = Orden.EsperarRespuesta,
+                Respuesta = respuesta
+            };
+            EnviarComando(ConexionJ2, commando);
+        }
+
+       
         private void RecibirJugador2()
         {
 
             IPEndPoint Ipserver = new(IPAddress.Any, puerto);
+            byte[] buffer = new byte[1024];
             Servidor = new(Ipserver);
             Servidor.Start();
             while (true)
@@ -146,11 +167,10 @@ namespace AdivinaQuienServidor.Services
                 try
                 {
                     var clieneNuevo = Servidor.AcceptTcpClient();
-                    Thread.Sleep(100);                    
-                    var stream = clieneNuevo.GetStream();
-                    byte[] buffer = new byte[1024];
+                    Thread.Sleep(100);
+                    var stream = clieneNuevo.GetStream();                    
                     int bytes = stream.Read(buffer, 0, buffer.Length);
-                    var json = Encoding.UTF8.GetString(buffer,0,bytes);
+                    var json = Encoding.UTF8.GetString(buffer, 0, bytes);
 
                     var ConectarCommand = JsonSerializer.Deserialize<ConectarCommando>(json);
 
@@ -165,7 +185,7 @@ namespace AdivinaQuienServidor.Services
                             Nombre = ConectarCommand.Nombre
                         };
                         NickPersonaje2 = ConectarCommand.Nombre;
-                        ConexionJ2.Conexion = clieneNuevo;
+                        ConexionJ2 = clieneNuevo;
                         JugadorConectado?.Invoke();
                         Thread Hilo = new Thread(EscucharCliente);
                         Hilo.IsBackground = true;
