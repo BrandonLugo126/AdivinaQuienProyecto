@@ -15,46 +15,89 @@ namespace AdivinaQuienCliente.Services
     {
 
         TcpClient? cliente;
-        public string puerto { get; set; } = "5000";
+        int puerto = 5000;
         public string? Nick { get; set; }
         public string? Personaje { get; set; }
-        public string IP { get; set; } = "127.0.0.1";
-        public ICommand ConnectarCommand { get; set; }
+        public IPAddress? IP { get; set; }
 
-        public ClienteService()
-        {
-            ConnectarCommand = new RelayCommand(ConectarAlServidor);
-        }
+        public event Action? JugadorConectado;
 
-        public void ConectarAlServidor()
+        public void ConectarAlServidor(IPAddress IP, string nombre)
         {
-            try
+
+            if (cliente == null)
             {
-                if (cliente == null)
+                cliente = new();
+                IPEndPoint endPoint = new(IP, puerto);
+                cliente.Connect(endPoint);
+
+                if (cliente.Connected)
                 {
-                    cliente = new();
-                    IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(IP),int.Parse(puerto));
-                    cliente.Connect(endPoint);
-                    if (cliente.Connected)
+                    Nick = nombre;
+                    var comando = new ConectarCommando
                     {
-                        Nick = "Brandon";
-                        var comando = new ConectarCommando
-                        {
-                            Comamando = Orden.Conectar,
-                            Nombre = Nick ?? "Brandon"
-                        };
-                        EnviarCommando(comando, cliente);
+                        Comamando = Orden.Conectar,
+                        Nombre = Nick ?? ""
+                    };
+                    Thread hilo = new Thread(EscucharServidor);
+                    hilo.IsBackground = true;
+                    hilo.Start();
+                    EnviarCommando(comando, cliente);
 
-                    }   
                 }
-
             }
-            catch
-            {
-
-            }
-
         }
+
+        private void EscucharServidor(object? obj)
+        {
+            if (cliente!=null)
+            {
+                try
+                {
+                    while (cliente.Connected)
+                    {
+                        if (cliente.Available>0)
+                        {
+                            var stream = cliente.GetStream();
+                            var buffer = new byte[cliente.Available];
+                            stream.ReadExactly(buffer, 0, buffer.Length);
+                            var json = Encoding.UTF8.GetString(buffer);
+                            var comando = JsonSerializer.Deserialize<Comandos>(json);
+                            if (comando != null) 
+                            {
+                                switch (comando.Comamando)
+                                {
+                                    case Orden.Conectar:
+                                        JugadorConectado?.Invoke();
+                                        break;
+                                    case Orden.SeleccionarPersonaje:
+                                        break;
+                                    case Orden.EsperarRespuesta:
+                                        break;
+                                    case Orden.Preguntar:
+                                        break;
+                                    case Orden.TerminarPartida:
+                                        break;
+                                    case Orden.AdivinarPersonaje:
+                                        break;
+                                    case Orden.TerminarTurno:
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+        }
+
         private void EnviarCommando(object comando, TcpClient Cliente)
         {
             var stream = Cliente.GetStream();

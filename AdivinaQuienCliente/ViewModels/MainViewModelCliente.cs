@@ -1,7 +1,9 @@
-﻿using GalaSoft.MvvmLight.Command;
+﻿using AdivinaQuienCliente.Services;
+using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Input;
@@ -12,13 +14,16 @@ namespace AdivinaQuienCliente.ViewModels
     {
         Conexion,
         SalaEspera,
-      
+
 
     }
     public class MainViewModelCliente : INotifyPropertyChanged
     {
         private TipoVista _vistaActual = TipoVista.Conexion;
+        ClienteService Service = new();
 
+        public string Nombre { get; set; }
+        public IPAddress? Ip { get; set; }
         public TipoVista VistaActual
         {
             get => _vistaActual;
@@ -28,11 +33,11 @@ namespace AdivinaQuienCliente.ViewModels
 
         public ICommand IrASalaCommand { get; }
         public ICommand VolverAConexionCommand { get; }
-     
-       public MainViewModelCliente()
+
+        public MainViewModelCliente()
         {
             IrASalaCommand = new RelayCommand(IrASala);
-            VolverAConexionCommand = new RelayCommand(VolverAConexion); 
+            VolverAConexionCommand = new RelayCommand(VolverAConexion);
         }
 
         private void VolverAConexion()
@@ -43,6 +48,7 @@ namespace AdivinaQuienCliente.ViewModels
         private void IrASala()
         {
             VistaActual = TipoVista.SalaEspera;
+            Service.ConectarAlServidor(Ip, Nombre);
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
