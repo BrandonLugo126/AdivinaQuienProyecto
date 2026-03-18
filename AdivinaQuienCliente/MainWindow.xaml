@@ -17,6 +17,11 @@
         <Grid.Resources>
             <viewmodels:ConexionView x:Key="VistaConexion"></viewmodels:ConexionView>
             <local:SalaEsperaView x:Key="VistaSala"></local:SalaEsperaView>
+            <local:SeleccionarPersonajeView x:Key="VistaSeleccionarPersonaje"></local:SeleccionarPersonajeView>
+            <local:DerrotaView x:Key="VistaDerrota"></local:DerrotaView>
+            <local:VictoriaView x:Key="VistaVictoria"></local:VictoriaView>
+            <local:TableroView x:Key="Tablero"></local:TableroView>
+                
         </Grid.Resources>
 
         <ContentControl>
@@ -28,6 +33,18 @@
                         </DataTrigger>
                         <DataTrigger Binding="{Binding VistaActual}" Value="{x:Static viewmodels:TipoVista.SalaEspera}">
                             <Setter Property="Content" Value="{StaticResource VistaSala}"/>
+                        </DataTrigger>
+                       <DataTrigger Binding="{Binding VistaActual}" Value="{x:Static viewmodels:TipoVista.SeleccionarPersonaje}">
+                            <Setter Property="Content" Value="{StaticResource VistaSeleccionarPersonaje}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding VistaActual}" Value="{x:Static viewmodels:TipoVista.Victoria}">
+                            <Setter Property="Content" Value="{Binding VistaVictoria}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding VistaActual}" Value="{x:Static viewmodels:TipoVista.Derrota}">
+                            <Setter Property="Content" Value="{Binding VistaDerrota}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding VistaActual}" Value="{x:Static viewmodels:TipoVista.Juego}">
+                            <Setter Property="Content" Value="{Binding Tablero}"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>

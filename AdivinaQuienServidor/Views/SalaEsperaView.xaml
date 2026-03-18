@@ -16,7 +16,7 @@
                    Margin="0,0,0,10" 
                    Foreground="#2C3E50"/>
 
-            <TextBlock Text="SALA DE ESPERA" 
+            <TextBlock Text="Esperando a que se conecte un jugador" 
                    FontSize="14" 
                    FontWeight="SemiBold"
                    Foreground="#7F8C8D"
@@ -33,12 +33,7 @@
                          Foreground="#27AE60" 
                          BorderThickness="0"/>
 
-                <TextBlock Text="Uniendose al servidor..." 
-                       HorizontalAlignment="Center" 
-                       Margin="0,15,0,0" 
-                       FontSize="11" 
-                       Foreground="Gray" 
-                       FontStyle="Italic"/>
+                
             </StackPanel>
 
            

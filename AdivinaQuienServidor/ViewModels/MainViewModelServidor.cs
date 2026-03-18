@@ -37,6 +37,11 @@ namespace AdivinaQuienServidor.ViewModels
         }
         public ICommand IniciarPartidaCommand { get; set; }
 
+        public ICommand SeleccionarPersonajeCommand { get; }
+
+        public ICommand VistaGanadaCommand { get; }
+        public ICommand VistaPerdidaCommand { get; }
+
         public MainViewModelServidor()
         {
             IniciarPartidaCommand = new RelayCommand(IrASala);
@@ -45,6 +50,27 @@ namespace AdivinaQuienServidor.ViewModels
                 ListaPersonajes.Add(p);
             }
             service.JugadorConectado += Service_JugadorConectado;
+
+           
+            SeleccionarPersonajeCommand = new RelayCommand(SeleccionarPersonaje);
+            VistaGanadaCommand = new RelayCommand(VistaGanada); 
+            VistaPerdidaCommand = new RelayCommand(VistaPerdida);
+
+        }
+
+        private void VistaPerdida()
+        {
+            VistaActual = TipoVista.Derrota;
+        }
+
+        private void VistaGanada()
+        {
+            VistaActual = TipoVista.Victoria;
+        }
+
+        private void SeleccionarPersonaje()
+        {
+            VistaActual = TipoVista.SeleccionarPersonaje;
         }
 
         private void Service_JugadorConectado()
@@ -54,14 +80,7 @@ namespace AdivinaQuienServidor.ViewModels
           
         }
 
-        private void VolverAInicio()
-        {
-            VistaActual = TipoVista.Inicio;
-        }
-        private void IrAJuego()
-        {
-            VistaActual = TipoVista.Juego;
-        }
+   
 
         private void IrASala()
         {

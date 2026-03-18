@@ -98,6 +98,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\SeleccionarPersonajeView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\TableroView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

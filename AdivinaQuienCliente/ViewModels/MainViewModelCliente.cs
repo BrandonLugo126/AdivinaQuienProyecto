@@ -14,6 +14,10 @@ namespace AdivinaQuienCliente.ViewModels
     {
         Conexion,
         SalaEspera,
+        SeleccionarPersonaje,
+        Victoria,
+        Juego,
+        Derrota
     }
     public class MainViewModelCliente : INotifyPropertyChanged
     {
@@ -31,11 +35,40 @@ namespace AdivinaQuienCliente.ViewModels
 
         public ICommand IrASalaCommand { get; }
         public ICommand VolverAConexionCommand { get; }
+        public ICommand SeleccionarPersonajeCommand { get; }
+        public ICommand VistaJuegoCommand { get; }
+        public ICommand VistaGanadaCommand { get; }
+        public ICommand VistaPerdidaCommand { get; }
 
         public MainViewModelCliente()
         {
             IrASalaCommand = new RelayCommand(IrASala);
             VolverAConexionCommand = new RelayCommand(VolverAConexion);
+            SeleccionarPersonajeCommand = new RelayCommand(SeleccionarPersonaje);
+            VistaGanadaCommand = new RelayCommand(VistaGanada);
+            VistaPerdidaCommand = new RelayCommand(VistaPerdida);
+            VistaJuegoCommand = new RelayCommand(VistaJuego);
+        }
+
+        private void VistaJuego()
+        {
+            VistaActual = TipoVista.Juego;
+        }
+
+        private void VistaPerdida()
+        {
+            VistaActual = TipoVista.Derrota;
+        }
+
+        private void VistaGanada()
+        {
+            VistaActual = TipoVista.Victoria;
+        }
+
+        private void SeleccionarPersonaje()
+        {
+            VistaActual = TipoVista.SeleccionarPersonaje;
+;
         }
 
         private void VolverAConexion()

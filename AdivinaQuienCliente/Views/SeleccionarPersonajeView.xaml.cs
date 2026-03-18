@@ -14,11 +14,11 @@ using System.Windows.Shapes;
 namespace AdivinaQuienCliente.Views
 {
     /// <summary>
-    /// Lógica de interacción para TableroView.xaml
+    /// Lógica de interacción para SeleccionarPersonajeView.xaml
     /// </summary>
-    public partial class TableroView : UserControl
+    public partial class SeleccionarPersonajeView : UserControl
     {
-        public TableroView()
+        public SeleccionarPersonajeView()
         {
             InitializeComponent();
         }
