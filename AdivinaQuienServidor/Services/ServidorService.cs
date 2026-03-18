@@ -85,12 +85,18 @@ namespace AdivinaQuienServidor.Services
                         JugadorTurno = NickPersonaje2
 
                     };
+                    var comando2 = new SeleccionarPersonajeCommando()
+                    {
+                        Comamando = Orden.SeleccionarPersonaje,
+                        NombrePersonaje = Personaje1
+                    };
                     EnviarComando(ConexionJ2, comando);
                     TurnoCambiado?.Invoke(NickPersonaje2);
+                    EnviarComando(ConexionJ2, comando2);
                 }
             }
         }
-        private void EnviarPregunta(string Pregunta)
+        public void EnviarPregunta(string Pregunta)
         {
             if (Jugador2Conectado && ConexionJ2 != null)
             {
@@ -108,7 +114,7 @@ namespace AdivinaQuienServidor.Services
                 else
                 {
                     LogActualizado?.Invoke("No es tu turno para hacer una pregunta.");
-                }
+                }                
             }
         }
 
@@ -192,11 +198,12 @@ namespace AdivinaQuienServidor.Services
                 try
                 {
                     var clieneNuevo = Servidor.AcceptTcpClient();
+
                     Thread.Sleep(100);
                     var stream = clieneNuevo.GetStream();
                     int bytes = stream.Read(buffer, 0, buffer.Length);
                     var json = Encoding.UTF8.GetString(buffer, 0, bytes);
-
+                   
                     var ConectarCommand = JsonSerializer.Deserialize<ConectarCommando>(json);
 
 
@@ -211,10 +218,11 @@ namespace AdivinaQuienServidor.Services
                         };
                         NickPersonaje2 = ConectarCommand.Nombre;
                         ConexionJ2 = clieneNuevo;
+                        Jugador2Conectado = true;
                         JugadorConectado?.Invoke();
                         Thread Hilo = new Thread(EscucharCliente);
                         Hilo.IsBackground = true;
-                        Hilo.Start();
+                        Hilo.Start(ConexionJ2);
                     }
 
                 }
@@ -233,7 +241,7 @@ namespace AdivinaQuienServidor.Services
 
                 try
                 {
-                    while (cliente.Connected)
+                    while (true)
                     {
                         if (cliente.Available > 0)
                         {
@@ -241,6 +249,36 @@ namespace AdivinaQuienServidor.Services
                             byte[] Buffer = new byte[cliente.Available];
                             stream.ReadExactly(Buffer, 0, Buffer.Length);
                             var json = Encoding.UTF8.GetString(Buffer);
+                            var comando = JsonSerializer.Deserialize<Comandos>(json);
+                            if (comando!=null)
+                            {
+                                switch (comando.Comamando)
+                                {                                  
+                                    case Orden.SeleccionarPersonaje:
+                                        var PersonajeSeleccionado = JsonSerializer.Deserialize<SeleccionarPersonajeCommando>(json);
+                                        if (PersonajeSeleccionado!=null)
+                                        {
+                                            Personaje2 = PersonajeSeleccionado.NombrePersonaje;
+                                            JuegoListoParaIniciar?.Invoke();
+                                            EnTurno = true;
+                                            Turno = NickServidor;
+                                        }
+                                        break;
+                                    case Orden.EsperarRespuesta:
+                                        break;
+                                    case Orden.Preguntar:
+                                        break;
+                                    case Orden.TerminarPartida:
+                                        break;
+                                    case Orden.AdivinarPersonaje:
+                                        break;
+                                    case Orden.TerminarTurno:
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                           
 
                         }
                     }

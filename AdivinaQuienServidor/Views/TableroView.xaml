@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:AdivinaQuienServidor.Views"
+             xmlns:local="clr-namespace:AdivinaQuienServidor.Views" xmlns:viewmodels="clr-namespace:AdivinaQuienServidor.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModelServidor}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Background="#F4F6F7">
@@ -64,7 +64,7 @@
                            TextAlignment="Center" Foreground="#F1C40F" FontWeight="Bold" FontSize="12" Margin="0,0,0,10"/>
 
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <ItemsControl ItemsSource="{Binding HistorialChat}">
+                        <ItemsControl ItemsSource="{Binding HistorialChat}" Foreground="White">
                         </ItemsControl>
                     </ScrollViewer>
                 </DockPanel>
@@ -76,9 +76,9 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBox  Padding="8" Margin="0,0,5,0" 
+                    <TextBox  Padding="8" Margin="0,0,5,0" Text="{Binding Pregunta}"
                          VerticalContentAlignment="Center" BorderThickness="0"/>
-                    <Button Grid.Column="1" Content="ENVIAR" Background="#27AE60" 
+                    <Button Grid.Column="1" Content="ENVIAR" Background="#27AE60"  Command="{Binding PreguntarCommand}" IsEnabled="{Binding TurnoPreguntar}"
                         Foreground="White" FontWeight="Bold" Padding="15,5" Cursor="Hand"/>
                 </Grid>
             </Border>
@@ -88,9 +88,9 @@
                         <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Button Margin="0,0,10,0"  Grid.Column="0" Content="SI" Background="#27AE60" 
+                    <Button Margin="0,0,10,0"  Grid.Column="0" Content="SI" Background="#27AE60" Command="{Binding ResponderCommand}" CommandParameter="Si"
         Foreground="White" FontWeight="Bold" Padding="15,5" Cursor="Hand"/>
-                    <Button Margin="10,0,0,0" Grid.Column="1" Content="NO" Background="#E74C3C" 
+                    <Button Margin="10,0,0,0" Grid.Column="1" Content="NO" Background="#E74C3C"  Command="{Binding ResponderCommand}" CommandParameter="No"
                        Foreground="White" FontWeight="Bold" Padding="15,5" Cursor="Hand"/>
                 </Grid>
             </Border>

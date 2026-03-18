@@ -14,7 +14,7 @@
         <Grid.Resources>
             <views:SalaEsperaView x:Key="Sala"></views:SalaEsperaView>
             <views:InicioView x:Key="Inicio"></views:InicioView>
-            <views:TableroView x:Key="Tablero"></views:TableroView>
+            <views:TableroView x:Key="VistaJuego"></views:TableroView>
             <views:DerrotaView x:Key="Derrota"></views:DerrotaView>
             <views:VictoriaView x:Key="Victoria"></views:VictoriaView>
             <views:SeleccionarPersonajeView x:Key="SeleccionarPersonaje"></views:SeleccionarPersonajeView>
@@ -30,7 +30,7 @@
                             <Setter Property="Content" Value="{StaticResource Sala}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding VistaActual}" Value="{x:Static vm:TipoVista.Juego}">
-                            <Setter Property="Content" Value="{StaticResource Tablero}"/>
+                            <Setter Property="Content" Value="{StaticResource VistaJuego}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding VistaActual}" Value="{x:Static vm:TipoVista.Victoria}">
                             <Setter Property="Content" Value="{StaticResource Victoria}"/>

@@ -1,12 +1,15 @@
 ﻿using AdivinaQuienCliente.Services;
+using AdivinaQuienServidor.Models;
 using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace AdivinaQuienCliente.ViewModels
 {
@@ -26,6 +29,15 @@ namespace AdivinaQuienCliente.ViewModels
 
         public string Nombre { get; set; }
         public string Ip { get; set; } = "127.0.0.1";
+        public string Pregunta { get; set; } = "";
+        public string Modo { get; set; } = "Normal";
+        public bool Enturno { get; set; }
+        public bool TurnoPreguntar { get; set; }
+        public bool TurnoResponder { get; set; }
+        public bool ConPersonaje { get; set; }
+        public ObservableCollection<Personaje> ListaPersonajes { get; set; } = new();
+        public ObservableCollection<string> HistorialChat { get; set; } = new();
+
         public TipoVista VistaActual
         {
             get => _vistaActual;
@@ -36,18 +48,92 @@ namespace AdivinaQuienCliente.ViewModels
         public ICommand IrASalaCommand { get; }
         public ICommand VolverAConexionCommand { get; }
         public ICommand SeleccionarPersonajeCommand { get; }
+        public ICommand AdivininarPersonajeCommand { get; }
+        public ICommand ResponderCommand { get; }
+        public ICommand PreguntarCommand { get; }
         public ICommand VistaJuegoCommand { get; }
         public ICommand VistaGanadaCommand { get; }
         public ICommand VistaPerdidaCommand { get; }
+        Dispatcher HiloUi;
 
         public MainViewModelCliente()
         {
             IrASalaCommand = new RelayCommand(IrASala);
             VolverAConexionCommand = new RelayCommand(VolverAConexion);
-            SeleccionarPersonajeCommand = new RelayCommand(SeleccionarPersonaje);
+            SeleccionarPersonajeCommand = new RelayCommand<string>(SeleccionarPersonaje);
             VistaGanadaCommand = new RelayCommand(VistaGanada);
             VistaPerdidaCommand = new RelayCommand(VistaPerdida);
             VistaJuegoCommand = new RelayCommand(VistaJuego);
+            AdivininarPersonajeCommand = new RelayCommand<string>(AdivinarPersonaje);
+            ResponderCommand = new RelayCommand<string>(Responder);
+            PreguntarCommand = new RelayCommand(Preguntar);
+            Service.JugadorConectado += Service_JugadorConectado;
+            Service.PersonajeServidorElegido += Service_PersonajeServidorElegido;
+            Service.ChatActualizado += Service_ChatActualizado;
+            Service.ServidorPregunto += Service_ServidorPregunto;
+            HiloUi = Dispatcher.CurrentDispatcher;
+            foreach (var p in Service.Personajes)
+            {
+                ListaPersonajes.Add(p);
+            }
+        }
+
+        private void Service_ServidorPregunto()
+        {
+            TurnoResponder = true;
+            TurnoPreguntar = false;
+            OnPropertyChanged(nameof(TurnoResponder));
+            OnPropertyChanged(nameof(TurnoPreguntar));
+        }
+
+        private void Service_ChatActualizado(string obj)
+        {
+            HiloUi.BeginInvoke(() =>
+            {
+                HistorialChat.Add(obj);           
+            });
+
+        }
+
+        private void Preguntar()
+        {
+            Service.EnviarPregunta(Pregunta);
+            TurnoPreguntar = false;
+            Pregunta = "";
+            OnPropertyChanged(Pregunta);
+            OnPropertyChanged(nameof(TurnoPreguntar));
+        }
+
+        private void Responder(string obj)
+        {
+            var respuesta = false;
+            if (obj == "Si")
+            {
+                respuesta= true;
+            }
+            else
+            {
+                respuesta = false;
+            }
+            Service.ProcesarRespuesta(respuesta);
+        }
+
+        private void AdivinarPersonaje(string obj)
+        {
+
+
+        }
+
+        private void Service_PersonajeServidorElegido()
+        {
+
+            ConPersonaje = true;
+            OnPropertyChanged(nameof(ConPersonaje));
+        }
+
+        private void Service_JugadorConectado()
+        {
+            VistaActual = TipoVista.SeleccionarPersonaje;
         }
 
         private void VistaJuego()
@@ -65,10 +151,10 @@ namespace AdivinaQuienCliente.ViewModels
             VistaActual = TipoVista.Victoria;
         }
 
-        private void SeleccionarPersonaje()
+        private void SeleccionarPersonaje(string nombre)
         {
-            VistaActual = TipoVista.SeleccionarPersonaje;
-;
+            Service.SeleccionarPersonaje(nombre);
+            VistaActual = TipoVista.Juego;
         }
 
         private void VolverAConexion()
@@ -78,7 +164,7 @@ namespace AdivinaQuienCliente.ViewModels
 
         private void IrASala()
         {
-            VistaActual = TipoVista.SalaEspera;
+            VistaActual = TipoVista.SeleccionarPersonaje;
             Service.ConectarAlServidor(IPAddress.Parse(Ip), Nombre);
         }
 

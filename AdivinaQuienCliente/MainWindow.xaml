@@ -20,7 +20,7 @@
             <local:SeleccionarPersonajeView x:Key="VistaSeleccionarPersonaje"></local:SeleccionarPersonajeView>
             <local:DerrotaView x:Key="VistaDerrota"></local:DerrotaView>
             <local:VictoriaView x:Key="VistaVictoria"></local:VictoriaView>
-            <local:TableroView x:Key="Tablero"></local:TableroView>
+            <local:TableroView x:Key="VistaJuego"></local:TableroView>
                 
         </Grid.Resources>
 
@@ -38,13 +38,13 @@
                             <Setter Property="Content" Value="{StaticResource VistaSeleccionarPersonaje}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding VistaActual}" Value="{x:Static viewmodels:TipoVista.Victoria}">
-                            <Setter Property="Content" Value="{Binding VistaVictoria}"/>
+                            <Setter Property="Content" Value="{StaticResource VistaVictoria}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding VistaActual}" Value="{x:Static viewmodels:TipoVista.Derrota}">
-                            <Setter Property="Content" Value="{Binding VistaDerrota}"/>
+                            <Setter Property="Content" Value="{StaticResource VistaDerrota}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding VistaActual}" Value="{x:Static viewmodels:TipoVista.Juego}">
-                            <Setter Property="Content" Value="{Binding Tablero}"/>
+                            <Setter Property="Content" Value="{StaticResource VistaJuego}"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
