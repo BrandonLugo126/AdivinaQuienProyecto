@@ -22,8 +22,32 @@ namespace AdivinaQuienCliente.Services
 
         public event Action? JugadorConectado;
         public bool Enturno;
-        public List<Personaje> Personajes = new List<Personaje>();
-
+        public List<Personaje> Personajes { get; set; } = new() {
+            new Personaje { Nombre = "Alejandro", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Alejandro.png" },
+            new Personaje { Nombre = "Camila", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Camila.png" },
+            new Personaje { Nombre = "Daniel", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Daniel.png" },
+            new Personaje { Nombre = "Daniela", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Daniela.png" },
+            new Personaje { Nombre = "Diego", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Diego.png" },
+            new Personaje { Nombre = "Emiliano", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Emiliano.png" },
+            new Personaje { Nombre = "Fernanda", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Fernanda.png" },
+            new Personaje { Nombre = "Gael", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Gael.png" },
+            new Personaje { Nombre = "Isabela", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Isabela.png" },
+            new Personaje { Nombre = "Jesús", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Jesús.png" },
+            new Personaje { Nombre = "Leonardo", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Leonardo.png" },
+            new Personaje { Nombre = "María", ImagenUrl = "/AdivinaQuienServidor;component/Assets/María.png" },
+            new Personaje { Nombre = "Mateo", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Mateo.png" },
+            new Personaje { Nombre = "Matías", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Matías.png" },
+            new Personaje { Nombre = "Miguel", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Miguel.png" },
+            new Personaje { Nombre = "Natalia", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Natalia.png" },
+            new Personaje { Nombre = "Regina", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Regina.png" },
+            new Personaje { Nombre = "Renata", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Renata.png" },
+            new Personaje { Nombre = "Santiago", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Santiago.png" },
+            new Personaje { Nombre = "Sebastián", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Sebastián.png" },
+            new Personaje { Nombre = "Sofía", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Sofía.png" },
+            new Personaje { Nombre = "Valentina", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Valentina.png" },
+            new Personaje { Nombre = "Valeria", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Valeria.png" },
+            new Personaje { Nombre = "Ximena", ImagenUrl = "/AdivinaQuienServidor;component/Assets/Ximena.png" }
+        };
         public void ConectarAlServidor(IPAddress IP, string nombre)
         
         {

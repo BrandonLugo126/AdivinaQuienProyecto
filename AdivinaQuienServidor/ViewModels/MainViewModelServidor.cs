@@ -1,7 +1,9 @@
-﻿using AdivinaQuienServidor.Services;
+﻿using AdivinaQuienServidor.Models;
+using AdivinaQuienServidor.Services;
 using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -14,12 +16,18 @@ namespace AdivinaQuienServidor.ViewModels
     {
         Inicio,
         SalaEspera,
+        Juego,
+        SeleccionarPersonaje,
+        Derrota,
+        Victoria
     }
     public class MainViewModelServidor : INotifyPropertyChanged
     {
         private TipoVista _vistaActual = TipoVista.Inicio;
         ServidorService service = new();
-        public string NombreServidor { get; set; } 
+        public string NombreServidor { get; set; }
+        public ObservableCollection<Personaje> ListaPersonajes { get; set; } = new();
+        public ObservableCollection<string> HistorialChat {  get; set; } = new();
         public TipoVista VistaActual
         {
             get => _vistaActual;
@@ -30,15 +38,23 @@ namespace AdivinaQuienServidor.ViewModels
         public MainViewModelServidor()
         {
             IniciarPartidaCommand = new RelayCommand(IrASala);
+            foreach (var p in service.Personajes)
+            {
+                ListaPersonajes.Add(p);
+            }
         }
         private void VolverAInicio()
         {
             VistaActual = TipoVista.Inicio;
         }
+        private void IrAJuego()
+        {
+            VistaActual = TipoVista.Juego;
+        }
 
         private void IrASala()
         {
-            VistaActual = TipoVista.SalaEspera;
+            VistaActual = TipoVista.Juego;
             service.AbrirSala(NombreServidor);
         }
 

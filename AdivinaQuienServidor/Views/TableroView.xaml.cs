@@ -11,7 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace AdivinaQuienServidor.ViewModels
+namespace AdivinaQuienServidor.Views
 {
     /// <summary>
     /// Lógica de interacción para TableroView.xaml
