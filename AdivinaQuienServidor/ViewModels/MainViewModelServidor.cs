@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Input;
+using System.Windows.Threading;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AdivinaQuienServidor.ViewModels
@@ -27,7 +28,8 @@ namespace AdivinaQuienServidor.ViewModels
         ServidorService service = new();
         public string NombreServidor { get; set; }
         public ObservableCollection<Personaje> ListaPersonajes { get; set; } = new();
-        public ObservableCollection<string> HistorialChat {  get; set; } = new();
+        public ObservableCollection<string> HistorialChat { get; set; } = new();
+        Dispatcher dispatcher;
         public TipoVista VistaActual
         {
             get => _vistaActual;
@@ -42,7 +44,16 @@ namespace AdivinaQuienServidor.ViewModels
             {
                 ListaPersonajes.Add(p);
             }
+            service.JugadorConectado += Service_JugadorConectado;
         }
+
+        private void Service_JugadorConectado()
+        {
+          
+                VistaActual = TipoVista.Juego;
+          
+        }
+
         private void VolverAInicio()
         {
             VistaActual = TipoVista.Inicio;
@@ -54,7 +65,7 @@ namespace AdivinaQuienServidor.ViewModels
 
         private void IrASala()
         {
-            VistaActual = TipoVista.Juego;
+            VistaActual = TipoVista.SalaEspera;
             service.AbrirSala(NombreServidor);
         }
 
