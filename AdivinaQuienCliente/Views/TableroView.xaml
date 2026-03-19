@@ -185,8 +185,7 @@ Margin="20,15" HorizontalAlignment="Center"/>
                 FontSize="12"
                 Padding="10" 
                 Cursor="Hand"
-                Command="{Binding AdivininarPersonajeCommand}"
-                CommandParameter="{Binding Pregunta}"
+                Command="{Binding CambiarDeModoCommand}"
                 IsEnabled="{Binding TurnoPreguntar}">
                     <Button.Resources>
                         <Style TargetType="Border">

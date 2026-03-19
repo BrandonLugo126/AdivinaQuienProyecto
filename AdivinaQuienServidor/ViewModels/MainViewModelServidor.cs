@@ -30,7 +30,7 @@ namespace AdivinaQuienServidor.ViewModels
         
         public string NombreServidor { get; set; }
         public string Pregunta { get; set; } = "";
-        public string Modo { get; set; } = "Normal";
+        public string Modo { get; set; } 
         public Personaje? PersonajeElegido { get; set; } = new Personaje();
         public bool Enturno { get; set; }
         public bool TurnoPreguntar { get; set; }
@@ -53,8 +53,9 @@ namespace AdivinaQuienServidor.ViewModels
         public ICommand PreguntarCommand { get; }
         public ICommand VistaGanadaCommand { get; }
         public ICommand VistaPerdidaCommand { get; }
-
+        public ICommand CambiarDeModoCommand { get; }
         public ICommand VoltearCartaCommand { get; }
+        
 
         public MainViewModelServidor()
         {
@@ -75,9 +76,15 @@ namespace AdivinaQuienServidor.ViewModels
             VistaGanadaCommand = new RelayCommand(VistaGanada);
             VistaPerdidaCommand = new RelayCommand(VistaPerdida);
             VoltearCartaCommand = new RelayCommand<object>(VoltearCarta);
+            CambiarDeModoCommand = new RelayCommand(CambiarModo);
 
             HiloUi = Dispatcher.CurrentDispatcher;
 
+        }
+        public void CambiarModo()
+        {
+            Modo = "Seleccion";
+            OnPropertyChanged(Modo);
         }
 
         private void Service_Ganador(string obj)

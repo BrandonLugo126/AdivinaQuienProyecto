@@ -32,7 +32,9 @@ namespace AdivinaQuienCliente.ViewModels
         public string Nombre { get; set; }
         public string Ip { get; set; } = "127.0.0.1";
         public string Pregunta { get; set; } = "";
-       
+        public string Modo { get; set; }
+
+
         public bool Enturno { get; set; }
         public bool TurnoPreguntar { get; set; }
         public bool TurnoResponder { get; set; }
@@ -60,6 +62,8 @@ namespace AdivinaQuienCliente.ViewModels
         public ICommand VistaJuegoCommand { get; }
         public ICommand VistaGanadaCommand { get; }
         public ICommand VistaPerdidaCommand { get; }
+        public ICommand CambiarDeModoCommand { get; }
+
         Dispatcher HiloUi;
 
         public MainViewModelCliente()
@@ -73,6 +77,9 @@ namespace AdivinaQuienCliente.ViewModels
             AdivininarPersonajeCommand = new RelayCommand<string>(AdivinarPersonaje);
             ResponderCommand = new RelayCommand<string>(Responder);
             PreguntarCommand = new RelayCommand(Preguntar);
+            CambiarDeModoCommand = new RelayCommand(CambiarModo);
+
+
             Service.JugadorConectado += Service_JugadorConectado;
             Service.PersonajeServidorElegido += Service_PersonajeServidorElegido;
             Service.ChatActualizado += Service_ChatActualizado;
@@ -84,6 +91,11 @@ namespace AdivinaQuienCliente.ViewModels
             }
 
             VoltearCartaCommand = new RelayCommand<object>(VoltearCarta);
+        }
+        public void CambiarModo()
+        {
+            Modo = "Seleccion";
+            OnPropertyChanged(Modo);
         }
 
         private void Service_ServidorPregunto()
