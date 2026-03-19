@@ -45,7 +45,7 @@ namespace AdivinaQuienServidor.Services
         public string? Personaje2 { get; set; }
         public string? NickServidor { get; set; }  //Nombre del servidor que pordefecto tendra el turno y personaje #1
         public string? NickPersonaje2 { get; set; }
-        public string? Turno { get; set; }
+        public string? Turno { get; set; } 
         public TcpClient ConexionJ2 { get; set; } = null!;
 
         int puerto = 5000;

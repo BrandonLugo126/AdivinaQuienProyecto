@@ -91,10 +91,12 @@ namespace AdivinaQuienServidor.ViewModels
         {
             HiloUi.BeginInvoke(() =>
             {
-                Enturno = true;
-                TurnoPreguntar = true;
+                Enturno = false;
+                TurnoPreguntar = false;
                 TurnoResponder = false;
-                PuedesAdivinar = true;
+                PuedesAdivinar = false;
+                Turno = $"Turno de {service.Turno}";
+                OnPropertyChanged(nameof(Turno));
                 OnPropertyChanged(nameof(Enturno));
                 OnPropertyChanged(nameof(TurnoPreguntar));
                 OnPropertyChanged(nameof(TurnoResponder));

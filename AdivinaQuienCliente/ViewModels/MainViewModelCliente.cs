@@ -98,7 +98,6 @@ namespace AdivinaQuienCliente.ViewModels
             {
                 ListaPersonajes.Add(p);
             }
-
             VoltearCartaCommand = new RelayCommand<object>(VoltearCarta);
         }
 
@@ -255,7 +254,9 @@ namespace AdivinaQuienCliente.ViewModels
         {
 
             ConPersonaje = true;
+            Turno = $"Turno de {Service.Turno}";
             OnPropertyChanged(nameof(ConPersonaje));
+            OnPropertyChanged(nameof(Turno));
         }
 
         private void Service_JugadorConectado()
@@ -284,6 +285,8 @@ namespace AdivinaQuienCliente.ViewModels
             VistaActual = TipoVista.Juego;
             PersonajeElegido = ListaPersonajes.Where(x => x.Nombre == nombre).First();
             OnPropertyChanged(nameof(PersonajeElegido));
+            Turno = $"Turno de {Service.Turno}";
+            OnPropertyChanged(nameof(Turno));
         }
 
         private void VolverAConexion()

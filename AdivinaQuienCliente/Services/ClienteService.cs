@@ -118,10 +118,8 @@ namespace AdivinaQuienCliente.Services
                 Enturno = false;
             }
 
-            // Notificar cambio de turno a la UI
             TurnoCambiado?.Invoke(Turno ?? "");
 
-            // Notificar al cliente del cambio de turno
             if (NickServer != null)
             {
                 var commando = new TerminarTurnoCommando()
@@ -169,6 +167,9 @@ namespace AdivinaQuienCliente.Services
                                         var respuesta = JsonSerializer.Deserialize<RespuestaCommando>(json);
                                         if (respuesta != null)
                                         {
+                                            var res = respuesta.Respuesta ? "Si" : "No";
+                                            HistorialPyR.Add($"{respuesta.Quien}: {res}");
+                                            ChatActualizado?.Invoke($"{respuesta.Quien}: {res}");
                                             CambiarDeTurno();
                                             ServidorRespondio?.Invoke();
                                         }
