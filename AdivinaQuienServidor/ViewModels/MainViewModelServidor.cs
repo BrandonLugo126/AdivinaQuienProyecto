@@ -158,6 +158,7 @@ namespace AdivinaQuienServidor.ViewModels
             ConPersonaje = false;
             OnPropertyChanged(nameof(ConPersonaje));
             PersonajeElegido = ListaPersonajes.Where(x=>x.Nombre==personaje).First();
+            OnPropertyChanged(nameof(PersonajeElegido));
         }
 
         private void Service_JugadorConectado()
