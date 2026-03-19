@@ -28,7 +28,7 @@ namespace AdivinaQuienCliente.Services
         public event Action? ServidorPregunto;
         public event Action? PartidaTerminada;
         public bool Enturno;
-      
+
 
 
         public List<string> HistorialPyR { get; set; } = new();
@@ -60,7 +60,7 @@ namespace AdivinaQuienCliente.Services
         };
 
         public void ConectarAlServidor(IPAddress IP, string nombre)
-        
+
         {
 
             if (cliente == null)
@@ -85,23 +85,23 @@ namespace AdivinaQuienCliente.Services
                 }
             }
         }
-      
+
         private void EscucharServidor(object? obj)
         {
-            if (cliente!=null)
+            if (cliente != null)
             {
                 try
                 {
                     while (cliente.Connected)
                     {
-                        if (cliente.Available>0)
+                        if (cliente.Available > 0)
                         {
                             var stream = cliente.GetStream();
                             var buffer = new byte[cliente.Available];
                             stream.ReadExactly(buffer, 0, buffer.Length);
                             var json = Encoding.UTF8.GetString(buffer);
                             var comando = JsonSerializer.Deserialize<Comandos>(json);
-                            if (comando != null) 
+                            if (comando != null)
                             {
                                 switch (comando.Comamando)
                                 {
@@ -109,42 +109,42 @@ namespace AdivinaQuienCliente.Services
                                         JugadorConectado?.Invoke();
                                         break;
                                     case Orden.SeleccionarPersonaje:
-                                       var personajeSeleccionado = JsonSerializer.Deserialize<SeleccionarPersonajeCommando>(json);
-                                        if (personajeSeleccionado!=null)
-                                        {                                           
+                                        var personajeSeleccionado = JsonSerializer.Deserialize<SeleccionarPersonajeCommando>(json);
+                                        if (personajeSeleccionado != null)
+                                        {
                                             PersonajeServidorElegido?.Invoke();
                                         }
 
                                         break;
                                     case Orden.EsperarRespuesta:
-                                        
+
                                         break;
                                     case Orden.Preguntar:
                                         var pregunta = JsonSerializer.Deserialize<PreguntaCommando>(json);
                                         if (pregunta != null)
                                         {
                                             HistorialPyR.Add($"{pregunta.Quien}: {pregunta.Pregunta}");
-                                            ChatActualizado?.Invoke($"{pregunta.Quien}: {pregunta.Pregunta}");    
+                                            ChatActualizado?.Invoke($"{pregunta.Quien}: {pregunta.Pregunta}");
                                             ServidorPregunto?.Invoke();
                                         }
                                         break;
                                     case Orden.TerminarPartida:
-                                        
+
                                         break;
-                                    case Orden.AdivinarPersonaje:
+                                    case Orden.AdivinarPersonaje:                                                                                                                       
                                         break;
                                     case Orden.TerminarTurno:
                                         var terminarTurno = JsonSerializer.Deserialize<TerminarTurnoCommando>(json);
-                                        if (terminarTurno!= null)
+                                        if (terminarTurno != null)
                                         {
                                             Turno = terminarTurno.JugadorTurno;
-                                            if (Nick==Turno)
+                                            if (Nick == Turno)
                                             {
                                                 Enturno = true;
                                             }
                                             else
                                             {
-                                                Enturno=false;
+                                                Enturno = false;
                                             }
                                         }
                                         break;
@@ -165,7 +165,7 @@ namespace AdivinaQuienCliente.Services
         }
         public void ProcesarRespuesta(bool respuesta)
         {
-            if (cliente!=null)
+            if (cliente != null)
             {
                 string Respues = respuesta ? "Si" : "No";
                 ChatActualizado?.Invoke($"{Turno}:{Respues}");
@@ -180,7 +180,7 @@ namespace AdivinaQuienCliente.Services
         }
         public void EnviarPregunta(string Pregunta)
         {
-            if (cliente!=null)
+            if (cliente != null)
             {
                 if (Turno == Nick && !string.IsNullOrWhiteSpace(Pregunta))
                 {
@@ -202,7 +202,7 @@ namespace AdivinaQuienCliente.Services
         }
         public void SeleccionarPersonaje(string personaje)
         {
-            if (cliente!=null && Enturno==true && Personaje=="")
+            if (cliente != null && Enturno == true && Personaje == "")
             {
                 var commando = new SeleccionarPersonajeCommando()
                 {
@@ -210,7 +210,19 @@ namespace AdivinaQuienCliente.Services
                     NombrePersonaje = personaje,
                 };
                 EnviarCommando(commando, cliente);
-            }         
+            }
+        }
+        public void IntentarAdivinar(string personaje)
+        {
+            if (cliente != null && personaje != "")
+            {
+                var commando = new AdivinarPersonajeCommando()
+                {
+                    Comamando = Orden.AdivinarPersonaje,
+                    PersonajeAdivinado = personaje,
+                };
+                EnviarCommando(commando, cliente);
+            }
         }
         private void EnviarCommando(object comando, TcpClient Cliente)
         {

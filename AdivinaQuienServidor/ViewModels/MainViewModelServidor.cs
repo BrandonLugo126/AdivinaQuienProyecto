@@ -31,10 +31,11 @@ namespace AdivinaQuienServidor.ViewModels
         public string NombreServidor { get; set; }
         public string Pregunta { get; set; } = "";
         public string Modo { get; set; } = "Normal";
-        public Personaje PersonajeElegido { get; set; } = new Personaje();
+        public Personaje? PersonajeElegido { get; set; } = new Personaje();
         public bool Enturno { get; set; }
         public bool TurnoPreguntar { get; set; }
         public bool TurnoResponder { get; set; }
+        public string Mensaje {  get; set; }
         public ObservableCollection<Personaje> ListaPersonajes { get; set; } = new();
         public ObservableCollection<string> HistorialChat { get; set; } = new();
         Dispatcher HiloUi;
@@ -65,6 +66,8 @@ namespace AdivinaQuienServidor.ViewModels
             service.JugadorConectado += Service_JugadorConectado;
             service.JuegoListoParaIniciar += Service_JuegoListoParaIniciar;
             service.ChatActualizado += Service_ChatActualizado;
+            service.PartidaTerminada += Service_PartidaTerminada;
+            service.Ganador += Service_Ganador;
             AdivininarPersonajeCommand = new RelayCommand<string>(AdivinarPersonaje);
             ResponderCommand = new RelayCommand<string>(Responder);
             PreguntarCommand = new RelayCommand(Preguntar);
@@ -75,6 +78,30 @@ namespace AdivinaQuienServidor.ViewModels
 
             HiloUi = Dispatcher.CurrentDispatcher;
 
+        }
+
+        private void Service_Ganador(string obj)
+        {
+            if (obj != null) {
+                if (NombreServidor == obj)
+                {
+                    VistaActual = TipoVista.Victoria;
+                }
+                else {
+                    VistaActual = TipoVista.Derrota;
+                }
+            }
+        }
+
+        private void Service_PartidaTerminada(string obj)
+        {
+            
+            PersonajeElegido = null;
+            if (obj != null) {
+                Mensaje = obj;
+            }
+            OnPropertyChanged(nameof(PersonajeElegido));
+            OnPropertyChanged(nameof(Mensaje));
         }
 
         private void VoltearCarta(object param)
@@ -117,6 +144,7 @@ namespace AdivinaQuienServidor.ViewModels
             Pregunta = "";
             OnPropertyChanged(nameof(Enturno));
             OnPropertyChanged(nameof(TurnoPreguntar));
+            OnPropertyChanged(nameof(Pregunta));
         }
 
         private void Responder(string obj)
@@ -133,12 +161,15 @@ namespace AdivinaQuienServidor.ViewModels
             service.ProcesarRespuesta(respuesta);
             TurnoResponder = false;
             OnPropertyChanged(nameof(TurnoResponder));
+            TurnoPreguntar = true;
+             OnPropertyChanged(nameof(TurnoPreguntar));
 
         }
 
         private void AdivinarPersonaje(string obj)
         {
             service.IntentarAdivinar(obj);
+
 
         }
         private void VistaPerdida()

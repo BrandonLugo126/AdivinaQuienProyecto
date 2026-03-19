@@ -1,6 +1,7 @@
 ﻿using AdivinaQuienServidor.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -60,6 +61,7 @@ namespace AdivinaQuienServidor.Services
         public event Action? JuegoListoParaIniciar; // Evento para notificar que el juego está listo para iniciar
         public event Action<string>? PartidaTerminada; // Evento para notificar que la partida ha terminado
         public event Action<string>? LogActualizado;//Solo para pruebas para saber que se estan recibiendo los comandos correctamente
+        public event Action<string>? Ganador;
 
         public void TerminarPatida()
         {
@@ -185,6 +187,7 @@ namespace AdivinaQuienServidor.Services
                     };
                     EnviarComando(ConexionJ2, commandoC);
                     PartidaTerminada?.Invoke($"¡{Turno} ha ganado! El personaje de {NickServidor} era {Personaje1} y el de {NickPersonaje2} era {Personaje2}.");
+                    Ganador?.Invoke(commandoC.NombreGanador);
                 }
              
             }
@@ -201,8 +204,10 @@ namespace AdivinaQuienServidor.Services
                     };
                     EnviarComando(ConexionJ2, comando);
                     PartidaTerminada?.Invoke($"¡{Turno} ha ganado! El personaje de {NickServidor} era {Personaje1} y el de {NickPersonaje2} era {Personaje2}.");
+                    Ganador?.Invoke(comando.NombreGanador);
+
                 }
-               
+
                 else
                 {
                     var comando = new TerminarTurnoCommando()

@@ -128,8 +128,7 @@ namespace AdivinaQuienCliente.ViewModels
 
         private void AdivinarPersonaje(string obj)
         {
-
-
+            Service.IntentarAdivinar(obj);
         }
 
         private void VoltearCarta(object param)
