@@ -27,10 +27,12 @@ namespace AdivinaQuienCliente.ViewModels
         private TipoVista _vistaActual = TipoVista.Conexion;
         ClienteService Service = new();
 
+   
+
         public string Nombre { get; set; }
         public string Ip { get; set; } = "127.0.0.1";
         public string Pregunta { get; set; } = "";
-        public string Modo { get; set; } = "Normal";
+       
         public bool Enturno { get; set; }
         public bool TurnoPreguntar { get; set; }
         public bool TurnoResponder { get; set; }
@@ -44,6 +46,8 @@ namespace AdivinaQuienCliente.ViewModels
             set { _vistaActual = value; OnPropertyChanged(); }
         }
 
+        // Nuevo comando para el modo normal (voltear carta)
+        public ICommand VoltearCartaCommand { get; }
 
         public ICommand IrASalaCommand { get; }
         public ICommand VolverAConexionCommand { get; }
@@ -76,6 +80,8 @@ namespace AdivinaQuienCliente.ViewModels
             {
                 ListaPersonajes.Add(p);
             }
+
+            VoltearCartaCommand = new RelayCommand<object>(VoltearCarta);
         }
 
         private void Service_ServidorPregunto()
@@ -124,6 +130,16 @@ namespace AdivinaQuienCliente.ViewModels
 
         }
 
+        private void VoltearCarta(object param)
+        {
+            // El parámetro es el botón que lanzó el evento
+            if (param is System.Windows.Controls.Button btn)
+            {
+                // Invertimos el estado guardado en el Tag
+                bool estadoActual = bool.Parse(btn.Tag.ToString());
+                btn.Tag = (!estadoActual).ToString();
+            }
+        }
         private void Service_PersonajeServidorElegido()
         {
 

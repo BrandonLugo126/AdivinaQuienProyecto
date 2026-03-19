@@ -27,6 +27,7 @@ namespace AdivinaQuienServidor.ViewModels
     {
         private TipoVista _vistaActual = TipoVista.Inicio;
         ServidorService service = new();
+        
         public string NombreServidor { get; set; }
         public string Pregunta { get; set; } = "";
         public string Modo { get; set; } = "Normal";
@@ -51,6 +52,8 @@ namespace AdivinaQuienServidor.ViewModels
         public ICommand VistaGanadaCommand { get; }
         public ICommand VistaPerdidaCommand { get; }
 
+        public ICommand VoltearCartaCommand { get; }
+
         public MainViewModelServidor()
         {
             IniciarPartidaCommand = new RelayCommand(IrASala);
@@ -67,9 +70,20 @@ namespace AdivinaQuienServidor.ViewModels
             SeleccionarPersonajeCommand = new RelayCommand<string>(SeleccionarPersonaje);
             VistaGanadaCommand = new RelayCommand(VistaGanada);
             VistaPerdidaCommand = new RelayCommand(VistaPerdida);
+            VoltearCartaCommand = new RelayCommand<object>(VoltearCarta);
 
         }
 
+        private void VoltearCarta(object param)
+        {
+            
+            if (param is System.Windows.Controls.Button btn)
+            {
+              
+                bool estadoActual = bool.Parse(btn.Tag.ToString());
+                btn.Tag = (!estadoActual).ToString();
+            }
+        }
         private void Service_ChatActualizado(string obj)
         {
 
