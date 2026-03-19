@@ -55,7 +55,7 @@ namespace AdivinaQuienServidor.Services
         public string Pregunta { get; set; } = null!;
         public string Respuesta { get; set; } = null!;
 
-        public event Action? JugadorConectado; // Evento para notificar que el jugador se ha conectado
+        public event Action? JugadorConectado,ClientePregunto,ClienteRespondio; // Evento para notificar que el jugador se ha conectado
         public event Action<string>? ChatActualizado; // Evento para notificar que el chat se ha actualizado
         public event Action<string>? TurnoCambiado; // Evento para notificar que el turno ha cambiado
         public event Action? JuegoListoParaIniciar; // Evento para notificar que el juego está listo para iniciar
@@ -132,50 +132,52 @@ namespace AdivinaQuienServidor.Services
             }
         }
 
-        public void TerminarTurno()
+        
+        public void CambiarDeTurno()
         {
-            if (Turno != NickServidor)
+            //if (Turno!=null)
+            //{
+            //    if (EnTurno==true)
+            //    {
+            //        Turno = NickPersonaje2;
+            //    }
+            //    else
+            //    {
+            //        Turno = NickServidor;
+            //    }
+            //    TurnoCambiado?.Invoke(Turno??"");
+            //    var commando = new TerminarTurnoCommando()
+            //    {
+            //        Comamando = Orden.TerminarTurno,
+            //        JugadorTurno = Turno ??""
+            //    };
+            //}
+            if (Turno == NickServidor)
             {
-                LogActualizado?.Invoke("No es tu turno para terminarlo.");
-                return;
+                Turno = NickPersonaje2;
+            }
+            else
+            {
+                Turno = NickServidor;
             }
 
-            Turno = NickPersonaje2;
-            TurnoCambiado?.Invoke(Turno);
-            var Commando = new TerminarTurnoCommando()
-            {
-                Comamando = Orden.TerminarTurno,
-                JugadorTurno = Turno ?? ""
-            };
-            EnviarComando(ConexionJ2, Commando);
-            EnTurno = false;
+            TurnoCambiado?.Invoke(Turno ?? "");
 
-        }
-        private void CambiarDeTurno()
-        {
-            if (Turno!=null)
+            if (ConexionJ2 != null)
             {
-                if (Turno == NickServidor)
-                {
-                    Turno = NickPersonaje2;
-                }
-                else
-                {
-                    Turno = NickServidor;
-                }
-                TurnoCambiado?.Invoke(Turno??"");
                 var commando = new TerminarTurnoCommando()
                 {
                     Comamando = Orden.TerminarTurno,
-                    JugadorTurno = Turno ??""
+                    JugadorTurno = Turno ?? ""
                 };
+                EnviarComando(ConexionJ2, commando);
             }
-         
+
         }
 
         public void IntentarAdivinar(string personaje)
         {
-            if (Turno != NickServidor)
+            if (Turno !=NickServidor)
             {
                 if (Personaje1 == personaje)
                 {
@@ -188,6 +190,7 @@ namespace AdivinaQuienServidor.Services
                     EnviarComando(ConexionJ2, commandoC);
                     PartidaTerminada?.Invoke($"¡{Turno} ha ganado! El personaje de {NickServidor} era {Personaje1} y el de {NickPersonaje2} era {Personaje2}.");
                     Ganador?.Invoke(commandoC.NombreGanador);
+                    TerminarPatida();
                 }
              
             }
@@ -205,6 +208,7 @@ namespace AdivinaQuienServidor.Services
                     EnviarComando(ConexionJ2, comando);
                     PartidaTerminada?.Invoke($"¡{Turno} ha ganado! El personaje de {NickServidor} era {Personaje1} y el de {NickPersonaje2} era {Personaje2}.");
                     Ganador?.Invoke(comando.NombreGanador);
+                    TerminarPatida();
 
                 }
 
@@ -310,6 +314,7 @@ namespace AdivinaQuienServidor.Services
                                             Personaje2 = PersonajeSeleccionado.NombrePersonaje;
                                             JuegoListoParaIniciar?.Invoke();
                                             EnTurno = true;
+                                            CambiarDeTurno();
                                             Turno = NickServidor;
                                         }
                                         break;
@@ -319,6 +324,8 @@ namespace AdivinaQuienServidor.Services
                                         {
                                             ChatActualizado?.Invoke($"{NickPersonaje2}: {procesarRespuesta(respues.Respuesta)}");
                                             TurnoCambiado?.Invoke(NickPersonaje2??"");
+                                            ClienteRespondio?.Invoke();
+                                            CambiarDeTurno();
                                         }
                                         break;
                                     case Orden.Preguntar:
@@ -326,6 +333,8 @@ namespace AdivinaQuienServidor.Services
                                         if (preg != null)
                                         {
                                             ChatActualizado?.Invoke($"{preg.Quien}: {preg.Pregunta}");
+                                            ClientePregunto?.Invoke();
+                                            EnTurno = false;
                                         }
                                         break;
                                     case Orden.TerminarPartida:
@@ -338,9 +347,7 @@ namespace AdivinaQuienServidor.Services
                                             IntentarAdivinar(adivinar.PersonajeAdivinado);
                                         }
                                         break;
-                                    case Orden.TerminarTurno:
-                                        TerminarTurno();                                  
-                                        break;
+                                   
                                     default:
                                         break;
                                 }

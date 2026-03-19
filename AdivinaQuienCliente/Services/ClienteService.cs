@@ -24,9 +24,11 @@ namespace AdivinaQuienCliente.Services
 
         public event Action? JugadorConectado;
         public event Action? PersonajeServidorElegido;
-        public event Action<string>? ChatActualizado;
-        public event Action? ServidorPregunto;
+        public event Action<string>? ChatActualizado, ServidorGano, ClienteGano, ClientePerdio;
+        public event Action? ServidorPregunto, ServidorRespondio;
         public event Action? PartidaTerminada;
+        public event Action<string>? TurnoCambiado;
+
         public bool Enturno;
 
 
@@ -86,6 +88,53 @@ namespace AdivinaQuienCliente.Services
             }
         }
 
+        public void CambiarDeTurno()
+        {
+            //if (Turno!=null)
+            //{
+            //    if (EnTurno==true)
+            //    {
+            //        Turno = NickPersonaje2;
+            //    }
+            //    else
+            //    {
+            //        Turno = NickServidor;
+            //    }
+            //    TurnoCambiado?.Invoke(Turno??"");
+            //    var commando = new TerminarTurnoCommando()
+            //    {
+            //        Comamando = Orden.TerminarTurno,
+            //        JugadorTurno = Turno ??""
+            //    };
+            //}
+            if (Turno == NickServer)
+            {
+                Turno = Nick;
+                Enturno = true;
+            }
+            else
+            {
+                Turno = NickServer;
+                Enturno = false;
+            }
+
+            // Notificar cambio de turno a la UI
+            TurnoCambiado?.Invoke(Turno ?? "");
+
+            // Notificar al cliente del cambio de turno
+            if (NickServer != null)
+            {
+                var commando = new TerminarTurnoCommando()
+                {
+                    Comamando = Orden.TerminarTurno,
+                    JugadorTurno = Turno ?? ""
+                };
+                EnviarCommando(commando, cliente);
+            }
+
+        }
+
+
         private void EscucharServidor(object? obj)
         {
             if (cliente != null)
@@ -114,38 +163,63 @@ namespace AdivinaQuienCliente.Services
                                         {
                                             PersonajeServidorElegido?.Invoke();
                                         }
-
+                                        CambiarDeTurno();
                                         break;
                                     case Orden.EsperarRespuesta:
-
+                                        var respuesta = JsonSerializer.Deserialize<RespuestaCommando>(json);
+                                        if (respuesta != null)
+                                        {
+                                            CambiarDeTurno();
+                                            ServidorRespondio?.Invoke();
+                                        }
                                         break;
                                     case Orden.Preguntar:
                                         var pregunta = JsonSerializer.Deserialize<PreguntaCommando>(json);
                                         if (pregunta != null)
                                         {
                                             HistorialPyR.Add($"{pregunta.Quien}: {pregunta.Pregunta}");
+                                            NickServer = pregunta.Quien;
                                             ChatActualizado?.Invoke($"{pregunta.Quien}: {pregunta.Pregunta}");
                                             ServidorPregunto?.Invoke();
                                         }
                                         break;
                                     case Orden.TerminarPartida:
+                                        var terminarPartida = JsonSerializer.Deserialize<TerminarPartidaCommando>(json);
+                                        if (terminarPartida != null)
+                                        {
+                                            Turno = terminarPartida.NombreGanador;
+                                            if (terminarPartida.NombreGanador == Nick)
+                                            {
+                                                ClienteGano?.Invoke($"Felizidades {Nick} ganaste el personaje de {NickServer} era {terminarPartida.PersonajeJ1}");
+                                            }
+                                            else
+                                            {
+                                                ClientePerdio?.Invoke($"Lo siento Has perdido el {terminarPartida.NombreGanador} ha ganado su personaje era {terminarPartida.PersonajeJ1}");
 
+                                            }
+
+                                        }
                                         break;
-                                    case Orden.AdivinarPersonaje:                                                                                                                       
+                                    case Orden.AdivinarPersonaje:
+                                        var adivinar = JsonSerializer.Deserialize<AdivinarPersonajeCommando>(json);
+                                        if (adivinar != null)
+                                        {
+                                            if (adivinar.PersonajeAdivinado == Personaje)
+                                            {
+                                                ServidorGano?.Invoke($"{NickServer} ha adivinado tu personaje {adivinar.PersonajeAdivinado}");
+                                            }
+                                            else
+                                            {
+                                                CambiarDeTurno();
+                                            }
+                                        }
                                         break;
                                     case Orden.TerminarTurno:
                                         var terminarTurno = JsonSerializer.Deserialize<TerminarTurnoCommando>(json);
                                         if (terminarTurno != null)
                                         {
                                             Turno = terminarTurno.JugadorTurno;
-                                            if (Nick == Turno)
-                                            {
-                                                Enturno = true;
-                                            }
-                                            else
-                                            {
-                                                Enturno = false;
-                                            }
+
                                         }
                                         break;
                                     default:
@@ -202,7 +276,7 @@ namespace AdivinaQuienCliente.Services
         }
         public void SeleccionarPersonaje(string personaje)
         {
-            if (cliente != null && Enturno == true && Personaje == "")
+            if (cliente != null && personaje != "")
             {
                 var commando = new SeleccionarPersonajeCommando()
                 {

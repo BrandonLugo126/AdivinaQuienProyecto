@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AdivinaQuienCliente.Views"
-             xmlns:viewmodels="clr-namespace:AdivinaQuienCliente.Views" xmlns:viewmodels1="clr-namespace:AdivinaQuienCliente.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels1:MainViewModelCliente}"
+             xmlns:viewmodels="clr-namespace:AdivinaQuienCliente.Views" xmlns:viewmodels1="clr-namespace:AdivinaQuienCliente.ViewModels" 
+             
              mc:Ignorable="d" 
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -23,7 +24,7 @@
 
                 <StackPanel>
 
-                    <TextBlock Text="Turno de Jugador:"
+                    <TextBlock Text="{Binding Turno}"
                         FontSize="18" FontWeight="DemiBold" Foreground="#2C3E50">
 
                     </TextBlock>
@@ -52,7 +53,7 @@ Margin="20,15" HorizontalAlignment="Center"/>
 
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding DataContext.Modo, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="Seleccion">
-                                                    <Setter Property="Command" Value="{Binding DataContext.SeleccionarPersonajeCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
+                                                    <Setter Property="Command" Value="{Binding DataContext.AdivininarPersonajeCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
                                                     <Setter Property="CommandParameter" Value="{Binding Nombre}"/>
                                                 </DataTrigger>
 
@@ -186,7 +187,7 @@ Margin="20,15" HorizontalAlignment="Center"/>
                 Padding="10" 
                 Cursor="Hand"
                 Command="{Binding CambiarDeModoCommand}"
-                IsEnabled="{Binding TurnoPreguntar}">
+                    IsEnabled="{Binding PuedesAdivinar}"    >
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>

@@ -20,7 +20,7 @@
                 </Grid.RowDefinitions>
                 <StackPanel>
 
-                    <TextBlock Text="Turno de Jugador:"
+                    <TextBlock Text="{Binding Turno}"
                                FontSize="18" FontWeight="DemiBold" Foreground="#2C3E50">
                         
                     </TextBlock>
@@ -50,7 +50,7 @@
 
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding DataContext.Modo, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="Seleccion">
-                                                    <Setter Property="Command" Value="{Binding DataContext.SeleccionarPersonajeCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
+                                                    <Setter Property="Command" Value="{Binding DataContext.AdivininarPersonajeCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
                                                     <Setter Property="CommandParameter" Value="{Binding Nombre}"/>
                                                 </DataTrigger>
 
@@ -180,8 +180,7 @@
                 Padding="10" 
                 Cursor="Hand"
                 Command="{Binding CambiarDeModoCommand}"
-                CommandParameter="{Binding Pregunta}"
-                IsEnabled="{Binding TurnoPreguntar}">
+                IsEnabled="{Binding PuedesAdivinar}">
                             <Button.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="5"/>

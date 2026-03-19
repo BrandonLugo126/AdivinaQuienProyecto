@@ -37,23 +37,15 @@
                     Padding="20" 
                     Margin="0,0,0,30">
                     <StackPanel>
-                        <TextBlock Text="EL PERSONAJE ERA:" 
-                               FontSize="10" 
-                               Foreground="#95A5A6" 
-                               HorizontalAlignment="Center" 
-                               FontWeight="Bold"/>
 
-                        <TextBlock Text="Nombre" 
-                               FontSize="24" 
+                        <TextBlock Text="{Binding Mensaje}" 
+                               FontSize="16" 
                                Foreground="#C0392B" 
                                FontWeight="Bold" 
                                HorizontalAlignment="Center" 
                                Margin="0,10,0,0"/>
 
-                        <TextBlock Text="👤" 
-                               FontSize="50" 
-                               HorizontalAlignment="Center" 
-                               Margin="0,10,0,0"/>
+                      
                     </StackPanel>
                 </Border>
 
