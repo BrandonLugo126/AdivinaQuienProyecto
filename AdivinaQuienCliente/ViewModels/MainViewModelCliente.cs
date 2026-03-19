@@ -37,6 +37,8 @@ namespace AdivinaQuienCliente.ViewModels
         public bool TurnoPreguntar { get; set; }
         public bool TurnoResponder { get; set; }
         public bool ConPersonaje { get; set; }
+        public Personaje? PersonajeElegido { get; set; } = new Personaje();
+
         public ObservableCollection<Personaje> ListaPersonajes { get; set; } = new();
         public ObservableCollection<string> HistorialChat { get; set; } = new();
 
@@ -172,6 +174,8 @@ namespace AdivinaQuienCliente.ViewModels
         {
             Service.SeleccionarPersonaje(nombre);
             VistaActual = TipoVista.Juego;
+            PersonajeElegido = ListaPersonajes.Where(x => x.Nombre == nombre).First();
+            OnPropertyChanged(nameof(PersonajeElegido));
         }
 
         private void VolverAConexion()
