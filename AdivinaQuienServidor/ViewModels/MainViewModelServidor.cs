@@ -31,6 +31,7 @@ namespace AdivinaQuienServidor.ViewModels
         public string NombreServidor { get; set; }
         public string Pregunta { get; set; } = "";
         public string Modo { get; set; } = "Normal";
+        public Personaje PersonajeElegido { get; set; } = new Personaje();
         public bool Enturno { get; set; }
         public bool TurnoPreguntar { get; set; }
         public bool TurnoResponder { get; set; }
@@ -156,7 +157,7 @@ namespace AdivinaQuienServidor.ViewModels
             service.SeleccionarPersonajeServidor(personaje);
             ConPersonaje = false;
             OnPropertyChanged(nameof(ConPersonaje));
-
+            PersonajeElegido = ListaPersonajes.Where(x=>x.Nombre==personaje).First();
         }
 
         private void Service_JugadorConectado()
