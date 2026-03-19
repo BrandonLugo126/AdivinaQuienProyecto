@@ -36,7 +36,7 @@ namespace AdivinaQuienServidor.ViewModels
         public bool TurnoResponder { get; set; }
         public ObservableCollection<Personaje> ListaPersonajes { get; set; } = new();
         public ObservableCollection<string> HistorialChat { get; set; } = new();
-        Dispatcher dispatcher;
+        Dispatcher HiloUi;
         public bool ConPersonaje { get; set; } = true;
         public TipoVista VistaActual
         {
@@ -72,6 +72,8 @@ namespace AdivinaQuienServidor.ViewModels
             VistaPerdidaCommand = new RelayCommand(VistaPerdida);
             VoltearCartaCommand = new RelayCommand<object>(VoltearCarta);
 
+            HiloUi = Dispatcher.CurrentDispatcher;
+
         }
 
         private void VoltearCarta(object param)
@@ -86,11 +88,14 @@ namespace AdivinaQuienServidor.ViewModels
         }
         private void Service_ChatActualizado(string obj)
         {
-
-            if (obj != "")
+            HiloUi.BeginInvoke(() =>
             {
-                HistorialChat.Add(obj);
-            }
+                if (obj != "")
+                {
+                    HistorialChat.Add(obj);
+                }
+
+            });
 
         }
 
@@ -110,19 +115,19 @@ namespace AdivinaQuienServidor.ViewModels
             TurnoPreguntar = false;
             Pregunta = "";
             OnPropertyChanged(nameof(Enturno));
-            OnPropertyChanged(nameof(Pregunta));
+            OnPropertyChanged(nameof(TurnoPreguntar));
         }
 
         private void Responder(string obj)
         {
             bool respuesta;
-            if (obj=="Si")
+            if (obj == "Si")
             {
                 respuesta = true;
             }
             else
             {
-                respuesta= false;
+                respuesta = false;
             }
             service.ProcesarRespuesta(respuesta);
             TurnoResponder = false;

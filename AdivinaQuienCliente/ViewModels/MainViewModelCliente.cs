@@ -122,6 +122,8 @@ namespace AdivinaQuienCliente.ViewModels
                 respuesta = false;
             }
             Service.ProcesarRespuesta(respuesta);
+            TurnoResponder = false;
+            OnPropertyChanged(nameof(TurnoResponder));
         }
 
         private void AdivinarPersonaje(string obj)

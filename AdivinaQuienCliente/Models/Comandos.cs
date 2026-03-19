@@ -19,14 +19,17 @@ namespace AdivinaQuienServidor.Models
     }
     public class PreguntaCommando : Comandos
     {
+        public string Quien { get; set; } = null!;
         public string Pregunta { get; set; } = null!;
     }
     public class RespuestaCommando : Comandos
     {
+        public string Quien { get; set; } = null!;
         public bool Respuesta { get; set; }
     }
     public class AdivinarPersonajeCommando : Comandos
     {
+        public string Quien { get; set; } = null!;
         public string PersonajeAdivinado { get; set; } = null!;
     }
     public class TerminarPartidaCommando : Comandos

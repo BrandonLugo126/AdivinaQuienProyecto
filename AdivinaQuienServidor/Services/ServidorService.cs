@@ -61,6 +61,17 @@ namespace AdivinaQuienServidor.Services
         public event Action<string>? PartidaTerminada; // Evento para notificar que la partida ha terminado
         public event Action<string>? LogActualizado;//Solo para pruebas para saber que se estan recibiendo los comandos correctamente
 
+        public void TerminarPatida()
+        {
+            Personaje2 = "";
+            Personaje1 = "";
+            Turno = "";
+            Respuesta = "";
+            Pregunta = "";
+            HistorialPyR.Clear();
+
+
+        }
         public void AbrirSala(string nombre)
         {
             if (juegoIniciado == false)
@@ -105,6 +116,7 @@ namespace AdivinaQuienServidor.Services
                     HistorialPyR.Add($"{NickServidor}: {Pregunta}");
                     var comando = new PreguntaCommando()
                     {
+                        Quien = NickServidor,
                         Comamando = Orden.Preguntar,
                         Pregunta = Pregunta
                     };
@@ -114,7 +126,7 @@ namespace AdivinaQuienServidor.Services
                 else
                 {
                     LogActualizado?.Invoke("No es tu turno para hacer una pregunta.");
-                }                
+                }
             }
         }
 
@@ -127,7 +139,7 @@ namespace AdivinaQuienServidor.Services
             }
 
             Turno = NickPersonaje2;
-            TurnoCambiado?.Invoke(Turno!);
+            TurnoCambiado?.Invoke(Turno);
             var Commando = new TerminarTurnoCommando()
             {
                 Comamando = Orden.TerminarTurno,
@@ -137,13 +149,44 @@ namespace AdivinaQuienServidor.Services
             EnTurno = false;
 
         }
+        private void CambiarDeTurno()
+        {
+            if (Turno!=null)
+            {
+                if (Turno == NickServidor)
+                {
+                    Turno = NickPersonaje2;
+                }
+                else
+                {
+                    Turno = NickServidor;
+                }
+                TurnoCambiado?.Invoke(Turno??"");
+                var commando = new TerminarTurnoCommando()
+                {
+                    Comamando = Orden.TerminarTurno,
+                    JugadorTurno = Turno ??""
+                };
+            }
+         
+        }
 
         public void IntentarAdivinar(string personaje)
         {
             if (Turno != NickServidor)
             {
-                LogActualizado?.Invoke("No es tu turno para intentar adivinar.");
-                return;
+                if (Personaje1 == personaje)
+                {
+                    var commandoC = new TerminarPartidaCommando() {
+                       Comamando = Orden.TerminarPartida,
+                       NombreGanador = NickPersonaje2 ??"",
+                       PersonajeJ1 = Personaje1,
+                       PersonajeJ2 = Personaje2??""
+                    };
+                    EnviarComando(ConexionJ2, commandoC);
+                    PartidaTerminada?.Invoke($"¡{Turno} ha ganado! El personaje de {NickServidor} era {Personaje1} y el de {NickPersonaje2} era {Personaje2}.");
+                }
+             
             }
             else
             {
@@ -152,13 +195,14 @@ namespace AdivinaQuienServidor.Services
                     var comando = new TerminarPartidaCommando
                     {
                         Comamando = Orden.TerminarPartida,
-                        NombreGanador = NickServidor ?? "",
+                        NombreGanador = Turno ?? "",
                         PersonajeJ1 = Personaje1 ?? "",
                         PersonajeJ2 = Personaje2 ?? ""
                     };
                     EnviarComando(ConexionJ2, comando);
-                    PartidaTerminada?.Invoke($"¡{NickServidor} ha ganado! El personaje de {NickServidor} era {Personaje1} y el de {NickPersonaje2} era {Personaje2}.");
+                    PartidaTerminada?.Invoke($"¡{Turno} ha ganado! El personaje de {NickServidor} era {Personaje1} y el de {NickPersonaje2} era {Personaje2}.");
                 }
+               
                 else
                 {
                     var comando = new TerminarTurnoCommando()
@@ -168,7 +212,7 @@ namespace AdivinaQuienServidor.Services
                     };
                     EnviarComando(ConexionJ2, comando);
                     TurnoCambiado?.Invoke(NickPersonaje2 ?? "");
-                    ChatActualizado?.Invoke($"{NickServidor} ha intentado adivinar y ha fallado. El turno pasa a {NickPersonaje2}.");
+                    ChatActualizado?.Invoke($"{Turno} ha intentado adivinar y ha fallado.");
                 }
             }
         }
@@ -203,7 +247,7 @@ namespace AdivinaQuienServidor.Services
                     var stream = clieneNuevo.GetStream();
                     int bytes = stream.Read(buffer, 0, buffer.Length);
                     var json = Encoding.UTF8.GetString(buffer, 0, bytes);
-                   
+
                     var ConectarCommand = JsonSerializer.Deserialize<ConectarCommando>(json);
 
 
@@ -250,13 +294,13 @@ namespace AdivinaQuienServidor.Services
                             stream.ReadExactly(Buffer, 0, Buffer.Length);
                             var json = Encoding.UTF8.GetString(Buffer);
                             var comando = JsonSerializer.Deserialize<Comandos>(json);
-                            if (comando!=null)
+                            if (comando != null)
                             {
                                 switch (comando.Comamando)
-                                {                                  
+                                {
                                     case Orden.SeleccionarPersonaje:
                                         var PersonajeSeleccionado = JsonSerializer.Deserialize<SeleccionarPersonajeCommando>(json);
-                                        if (PersonajeSeleccionado!=null)
+                                        if (PersonajeSeleccionado != null)
                                         {
                                             Personaje2 = PersonajeSeleccionado.NombrePersonaje;
                                             JuegoListoParaIniciar?.Invoke();
@@ -265,20 +309,38 @@ namespace AdivinaQuienServidor.Services
                                         }
                                         break;
                                     case Orden.EsperarRespuesta:
+                                        var respues = JsonSerializer.Deserialize<RespuestaCommando>(json);
+                                        if (respues != null)
+                                        {
+                                            ChatActualizado?.Invoke($"{NickPersonaje2}: {procesarRespuesta(respues.Respuesta)}");
+                                            TurnoCambiado?.Invoke(NickPersonaje2??"");
+                                        }
                                         break;
                                     case Orden.Preguntar:
+                                        var preg = JsonSerializer.Deserialize<PreguntaCommando>(json);
+                                        if (preg != null)
+                                        {
+                                            ChatActualizado?.Invoke($"{preg.Quien}: {preg.Pregunta}");
+                                        }
                                         break;
                                     case Orden.TerminarPartida:
+                                        TerminarPatida();
                                         break;
                                     case Orden.AdivinarPersonaje:
+                                        var adivinar = JsonSerializer.Deserialize<AdivinarPersonajeCommando>(json);
+                                        if (adivinar != null)
+                                        {
+                                            IntentarAdivinar(adivinar.PersonajeAdivinado);
+                                        }
                                         break;
                                     case Orden.TerminarTurno:
+                                        TerminarTurno();                                  
                                         break;
                                     default:
                                         break;
                                 }
                             }
-                           
+
 
                         }
                     }
@@ -290,6 +352,18 @@ namespace AdivinaQuienServidor.Services
                 }
             }
 
+        }
+
+        private string procesarRespuesta(bool res)
+        {
+            if (res == true)
+            {
+                return "Si";
+            }
+            else
+            {
+                return "No";
+            }
         }
         public void IniciarJuego()
         {

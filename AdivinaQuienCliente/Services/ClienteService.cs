@@ -17,6 +17,7 @@ namespace AdivinaQuienCliente.Services
         TcpClient? cliente;
         int puerto = 5000;
         public string? Nick { get; set; }
+        public string? NickServer { get; set; }
         public string Personaje { get; set; } = "";
         public string? Turno { get; set; }
         public string MensajeError { get; private set; } = "";
@@ -25,6 +26,7 @@ namespace AdivinaQuienCliente.Services
         public event Action? PersonajeServidorElegido;
         public event Action<string>? ChatActualizado;
         public event Action? ServidorPregunto;
+        public event Action? PartidaTerminada;
         public bool Enturno;
       
 
@@ -109,7 +111,7 @@ namespace AdivinaQuienCliente.Services
                                     case Orden.SeleccionarPersonaje:
                                        var personajeSeleccionado = JsonSerializer.Deserialize<SeleccionarPersonajeCommando>(json);
                                         if (personajeSeleccionado!=null)
-                                        {
+                                        {                                           
                                             PersonajeServidorElegido?.Invoke();
                                         }
 
@@ -121,8 +123,8 @@ namespace AdivinaQuienCliente.Services
                                         var pregunta = JsonSerializer.Deserialize<PreguntaCommando>(json);
                                         if (pregunta != null)
                                         {
-                                            HistorialPyR.Add($"Servidor:{pregunta.Pregunta}");
-                                            ChatActualizado?.Invoke($"Servidor:{pregunta.Pregunta}");    
+                                            HistorialPyR.Add($"{pregunta.Quien}: {pregunta.Pregunta}");
+                                            ChatActualizado?.Invoke($"{pregunta.Quien}: {pregunta.Pregunta}");    
                                             ServidorPregunto?.Invoke();
                                         }
                                         break;
@@ -169,6 +171,7 @@ namespace AdivinaQuienCliente.Services
                 ChatActualizado?.Invoke($"{Turno}:{Respues}");
                 var commando = new RespuestaCommando()
                 {
+                    Quien = Nick,
                     Comamando = Orden.EsperarRespuesta,
                     Respuesta = respuesta
                 };
@@ -184,6 +187,7 @@ namespace AdivinaQuienCliente.Services
                     HistorialPyR.Add($"{Nick}: {Pregunta}");
                     var comando = new PreguntaCommando()
                     {
+                        Quien = Nick,
                         Comamando = Orden.Preguntar,
                         Pregunta = Pregunta
                     };
