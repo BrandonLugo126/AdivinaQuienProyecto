@@ -275,6 +275,8 @@ namespace AdivinaQuienServidor.ViewModels
             service.IntentarAdivinar(obj);
             service.CambiarDeTurno();
             Turno = $"Turno de {service.Turno}";
+            Modo = null;
+            OnPropertyChanged(nameof(Modo));
 
         }
         private void VistaPerdida()

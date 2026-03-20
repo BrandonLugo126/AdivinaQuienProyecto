@@ -187,6 +187,7 @@ namespace AdivinaQuienCliente.ViewModels
         public void CambiarModo()
         {
             Modo = "Seleccion";
+            
             OnPropertyChanged(nameof(Modo));
             TurnoResponder = false;
             TurnoPreguntar = false;
@@ -258,6 +259,8 @@ namespace AdivinaQuienCliente.ViewModels
         {
             Service.IntentarAdivinar(obj);
             Service.CambiarDeTurno();
+            Modo = null;
+            OnPropertyChanged(nameof(Modo));
         }
 
         private void VoltearCarta(object param)

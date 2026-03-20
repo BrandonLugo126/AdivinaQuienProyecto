@@ -56,7 +56,7 @@
                     HorizontalAlignment="Center" 
                     Margin="0,0,0,25"/>
 
-                <StackPanel  HorizontalAlignment="Center" Orientation="Horizontal">
+                <!--<StackPanel  HorizontalAlignment="Center" Orientation="Horizontal">
                     <Button Margin="10" Padding="10" Content="VOLVER A JUGAR" 
                             Command="{Binding IrASalaCommand}"
                             Background="#2C3E50" 
@@ -84,7 +84,7 @@
                             </Style>
                         </Button.Resources>
                     </Button>
-                </StackPanel>
+                </StackPanel>-->
 
                
                 
