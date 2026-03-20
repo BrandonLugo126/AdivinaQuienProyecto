@@ -221,7 +221,7 @@ namespace AdivinaQuienCliente.Services
                                         if (terminarTurno != null)
                                         {
                                             Turno = terminarTurno.JugadorTurno;
-                                            if (Personaje!="" && Turno==Nick)
+                                            if (Personaje!="" && Turno==Nick && terminarTurno.IntentoAdivinar==true)
                                             {
                                                 ChatActualizado?.Invoke($"{Turno} ha intentado adivinar y ha fallado.");
                                                 ServidorFallo?.Invoke();
@@ -301,6 +301,7 @@ namespace AdivinaQuienCliente.Services
                 {
                     Comamando = Orden.AdivinarPersonaje,
                     PersonajeAdivinado = personaje,
+                    
                 };
                 EnviarCommando(commando, cliente);
             }

@@ -55,7 +55,7 @@ namespace AdivinaQuienServidor.Services
         public string Pregunta { get; set; } = null!;
         public string Respuesta { get; set; } = null!;
 
-        public event Action? JugadorConectado,ClientePregunto,ClienteRespondio; // Evento para notificar que el jugador se ha conectado
+        public event Action? JugadorConectado,ClientePregunto,ClienteRespondio,ClienteIntentoAdivinar; // Evento para notificar que el jugador se ha conectado
         public event Action<string>? ChatActualizado; // Evento para notificar que el chat se ha actualizado
         public event Action<string>? TurnoCambiado; // Evento para notificar que el turno ha cambiado
         public event Action? JuegoListoParaIniciar; // Evento para notificar que el juego está listo para iniciar
@@ -202,6 +202,7 @@ namespace AdivinaQuienServidor.Services
                     };
                     EnviarComando(ConexionJ2, comando);
                     TurnoCambiado?.Invoke(NickPersonaje2 ?? "");
+                    ClienteIntentoAdivinar?.Invoke();
                     ChatActualizado?.Invoke($"{Turno} ha intentado adivinar y ha fallado.");
                 }
              
@@ -229,7 +230,8 @@ namespace AdivinaQuienServidor.Services
                     var comando = new TerminarTurnoCommando()
                     {
                         Comamando = Orden.TerminarTurno,
-                        JugadorTurno = NickPersonaje2 ?? ""
+                        JugadorTurno = NickPersonaje2 ?? "",
+                        IntentoAdivinar = true                        
                     };
                     EnviarComando(ConexionJ2, comando);
                     TurnoCambiado?.Invoke(NickPersonaje2 ?? "");

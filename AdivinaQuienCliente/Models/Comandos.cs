@@ -42,6 +42,8 @@ namespace AdivinaQuienServidor.Models
     public class TerminarTurnoCommando : Comandos
     {
         public string JugadorTurno { get; set; } = null!;
+        public bool? IntentoAdivinar { get; set; }
+
     }
 
 }

@@ -75,6 +75,7 @@ namespace AdivinaQuienServidor.ViewModels
             service.Ganador += Service_Ganador;
             service.ClientePregunto += Service_ClientePregunto;
             service.ClienteRespondio += Service_ClienteRespondio;
+            service.ClienteIntentoAdivinar += Service_ClienteIntentoAdivinar;
             AdivininarPersonajeCommand = new RelayCommand<string>(AdivinarPersonaje);
             ResponderCommand = new RelayCommand<string>(Responder);
             PreguntarCommand = new RelayCommand(Preguntar);
@@ -86,6 +87,18 @@ namespace AdivinaQuienServidor.ViewModels
 
             HiloUi = Dispatcher.CurrentDispatcher;
 
+        }
+
+        private void Service_ClienteIntentoAdivinar()
+        {
+            HiloUi.BeginInvoke(() =>
+            {
+                TurnoPreguntar = true;
+                PuedesAdivinar = true;
+                OnPropertyChanged(nameof(TurnoPreguntar));
+                OnPropertyChanged(nameof(PuedesAdivinar));
+
+            });
         }
 
         private void Service_ClienteRespondio()

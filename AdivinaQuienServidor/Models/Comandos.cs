@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Documents;
 
 namespace AdivinaQuienServidor.Models
 {
@@ -44,6 +45,7 @@ namespace AdivinaQuienServidor.Models
     public class TerminarTurnoCommando : Comandos
     {
         public string JugadorTurno { get; set; } = null!;
+        public bool? IntentoAdivinar { get; set; }
     }
 
 }
