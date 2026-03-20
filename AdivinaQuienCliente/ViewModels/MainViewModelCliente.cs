@@ -54,7 +54,6 @@ namespace AdivinaQuienCliente.ViewModels
         }
 
 
-        // Nuevo comando para el modo normal (voltear carta)
         public ICommand VoltearCartaCommand { get; }
 
         public ICommand IrASalaCommand { get; }
@@ -165,13 +164,7 @@ namespace AdivinaQuienCliente.ViewModels
             {
                 Turno = $"Turno de {obj}";
                 OnPropertyChanged(nameof(Turno));
-                //if (obj == Nombre)
-                //{
-                //    Enturno = true;
-                //    TurnoPreguntar = true;
-                //    TurnoResponder = false;
-                //    PuedesAdivinar = true;
-                //    OnPropertyChanged(nameof(Enturno));
+               
                 if (Nombre == obj)
                 {
                     PuedesAdivinar = true;
@@ -185,10 +178,7 @@ namespace AdivinaQuienCliente.ViewModels
                     TurnoResponder = false;
                 }
                 OnPropertyChanged();
-                //    OnPropertyChanged(nameof(TurnoPreguntar));
-                //    OnPropertyChanged(nameof(TurnoResponder));
-                //    OnPropertyChanged(nameof(PuedesAdivinar));
-                //}
+                
 
             });
 
@@ -272,10 +262,10 @@ namespace AdivinaQuienCliente.ViewModels
 
         private void VoltearCarta(object param)
         {
-            // El parámetro es el botón que lanzó el evento
+           
             if (param is System.Windows.Controls.Button btn)
             {
-                // Invertimos el estado guardado en el Tag
+              
                 bool estadoActual = bool.Parse(btn.Tag.ToString());
                 btn.Tag = (!estadoActual).ToString();
             }

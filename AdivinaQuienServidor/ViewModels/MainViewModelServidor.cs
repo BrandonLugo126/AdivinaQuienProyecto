@@ -139,13 +139,7 @@ namespace AdivinaQuienServidor.ViewModels
             {
 
                 Turno = $"Turno de {obj}";
-                //if (obj == NombreServidor)
-                //{
-                //    Enturno = true;
-                //    TurnoPreguntar = true;
-                //    TurnoResponder = false;
-                //    PuedesAdivinar = true;
-                //    OnPropertyChanged(nameof(Enturno));
+               
                 if (NombreServidor==obj)
                 {
                     PuedesAdivinar = true;
@@ -159,22 +153,7 @@ namespace AdivinaQuienServidor.ViewModels
                     TurnoResponder = false;
                 }
                 OnPropertyChanged();
-                //    OnPropertyChanged(nameof(TurnoPreguntar));
-                //    OnPropertyChanged(nameof(TurnoResponder));
-                //    OnPropertyChanged(nameof(PuedesAdivinar));
-
-                //}
-                //else
-                //{
-                //    Enturno = false;
-                //    TurnoPreguntar = false;
-                //    TurnoResponder = true;
-                //    PuedesAdivinar = false;
-                //    OnPropertyChanged(nameof(Enturno));
-                //    OnPropertyChanged(nameof(TurnoPreguntar));
-                //    OnPropertyChanged(nameof(TurnoResponder));
-                //    OnPropertyChanged(nameof(PuedesAdivinar));
-                //}
+               
             });
         }
 

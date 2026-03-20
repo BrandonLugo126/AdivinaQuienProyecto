@@ -41,9 +41,9 @@ namespace AdivinaQuienServidor.Services
         public List<string> HistorialPyR { get; set; } = new List<string>();
 
 
-        public string? Personaje1 { get; set; } // Por defecto siempre va a hacer el del servidor
+        public string? Personaje1 { get; set; } 
         public string? Personaje2 { get; set; }
-        public string? NickServidor { get; set; }  //Nombre del servidor que pordefecto tendra el turno y personaje #1
+        public string? NickServidor { get; set; } 
         public string? NickPersonaje2 { get; set; }
         public string? Turno { get; set; } 
         public TcpClient ConexionJ2 { get; set; } = null!;
@@ -55,12 +55,12 @@ namespace AdivinaQuienServidor.Services
         public string Pregunta { get; set; } = null!;
         public string Respuesta { get; set; } = null!;
 
-        public event Action? JugadorConectado,ClientePregunto,ClienteRespondio,ClienteIntentoAdivinar; // Evento para notificar que el jugador se ha conectado
-        public event Action<string>? ChatActualizado; // Evento para notificar que el chat se ha actualizado
-        public event Action<string>? TurnoCambiado; // Evento para notificar que el turno ha cambiado
-        public event Action? JuegoListoParaIniciar; // Evento para notificar que el juego está listo para iniciar
-        public event Action<string>? PartidaTerminada; // Evento para notificar que la partida ha terminado
-        public event Action<string>? LogActualizado;//Solo para pruebas para saber que se estan recibiendo los comandos correctamente
+        public event Action? JugadorConectado,ClientePregunto,ClienteRespondio,ClienteIntentoAdivinar; 
+        public event Action<string>? ChatActualizado; 
+        public event Action<string>? TurnoCambiado; 
+        public event Action? JuegoListoParaIniciar;
+        public event Action<string>? PartidaTerminada;
+        public event Action<string>? LogActualizado;
         public event Action<string>? Ganador;
 
         public void TerminarPatida()
@@ -80,7 +80,7 @@ namespace AdivinaQuienServidor.Services
             {
                 juegoIniciado = true;
                 NickServidor = nombre;
-                Thread Hilo = new Thread(RecibirJugador2); //Hilo para recibir al jugador 2 y comenzar el juego
+                Thread Hilo = new Thread(RecibirJugador2);
                 Hilo.IsBackground = true;
                 Hilo.Start();
             }
@@ -136,23 +136,7 @@ namespace AdivinaQuienServidor.Services
         
         public void CambiarDeTurno()
         {
-            //if (Turno!=null)
-            //{
-            //    if (EnTurno==true)
-            //    {
-            //        Turno = NickPersonaje2;
-            //    }
-            //    else
-            //    {
-            //        Turno = NickServidor;
-            //    }
-            //    TurnoCambiado?.Invoke(Turno??"");
-            //    var commando = new TerminarTurnoCommando()
-            //    {
-            //        Comamando = Orden.TerminarTurno,
-            //        JugadorTurno = Turno ??""
-            //    };
-            //}
+         
             if (Turno == NickServidor)
             {
                 Turno = NickPersonaje2;

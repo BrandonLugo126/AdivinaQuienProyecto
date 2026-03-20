@@ -91,23 +91,7 @@ namespace AdivinaQuienCliente.Services
 
         public void CambiarDeTurno()
         {
-            //if (Turno!=null)
-            //{
-            //    if (EnTurno==true)
-            //    {
-            //        Turno = NickPersonaje2;
-            //    }
-            //    else
-            //    {
-            //        Turno = NickServidor;
-            //    }
-            //    TurnoCambiado?.Invoke(Turno??"");
-            //    var commando = new TerminarTurnoCommando()
-            //    {
-            //        Comamando = Orden.TerminarTurno,
-            //        JugadorTurno = Turno ??""
-            //    };
-            //}
+           
             if (Turno == NickServer)
             {
                 Turno = Nick;
