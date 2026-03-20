@@ -56,9 +56,9 @@
                     HorizontalAlignment="Center" 
                     Margin="0,0,0,25"/>
 
-                <!--<StackPanel  HorizontalAlignment="Center" Orientation="Horizontal">
+                <StackPanel  HorizontalAlignment="Center" Orientation="Horizontal">
                     <Button Margin="10" Padding="10" Content="VOLVER A JUGAR" 
-                            Command="{Binding IrASalaCommand}"
+                            Command="{Binding VolverAJugarCommand}"
                             Background="#2C3E50" 
                             Foreground="White" 
                             FontWeight="Bold" 
@@ -71,20 +71,7 @@
                         </Button.Resources>
                     </Button>
 
-                    <Button Margin="10" Padding="10" Content="NUEVA PARTIDA" 
-                            Command="{Binding VolverAConexionCommand}"
-                            Background="#2C3E50" 
-                            Foreground="White" 
-                            FontWeight="Bold" 
-                            Height="45"
-                            Cursor="Hand">
-                        <Button.Resources>
-                            <Style TargetType="Border">
-                                <Setter Property="CornerRadius" Value="8"/>
-                            </Style>
-                        </Button.Resources>
-                    </Button>
-                </StackPanel>-->
+                </StackPanel>
 
                
                 

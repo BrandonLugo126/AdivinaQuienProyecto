@@ -16,7 +16,7 @@
 
             <TextBlock Text="Nombre:" Margin="0,5"/>
             <TextBox Padding="5" Margin="0,0,0,25" Text="{Binding Nombre}"/>
-
+            <TextBlock Text="{Binding Error}" HorizontalAlignment="Center" Foreground="Red" ></TextBlock>
             <Button
                 Command="{Binding IrASalaCommand}"
                 Content="CONECTARSE" 

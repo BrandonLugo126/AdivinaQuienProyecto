@@ -31,6 +31,8 @@ namespace AdivinaQuienServidor.ViewModels
 
         public string NombreServidor { get; set; }
         public string Pregunta { get; set; } = "";
+        public string Error { get; set; } = "";
+        public string MensajeElegir { get; set; } = "Tu turno de elegir";
         public object Modo { get; set; }
         public Personaje? PersonajeElegido { get; set; } = new Personaje();
         public bool Enturno { get; set; }
@@ -58,6 +60,7 @@ namespace AdivinaQuienServidor.ViewModels
         public ICommand VistaPerdidaCommand { get; }
         public ICommand CambiarDeModoCommand { get; }
         public ICommand VoltearCartaCommand { get; }
+        public ICommand VolverAJugarCommand { get; }
 
 
         public MainViewModelServidor()
@@ -84,9 +87,40 @@ namespace AdivinaQuienServidor.ViewModels
             VistaPerdidaCommand = new RelayCommand(VistaPerdida);
             VoltearCartaCommand = new RelayCommand<object>(VoltearCarta);
             CambiarDeModoCommand = new RelayCommand(CambiarModo);
-
+            VolverAJugarCommand = new RelayCommand(VolverAjugar);
             HiloUi = Dispatcher.CurrentDispatcher;
 
+        }
+
+        private void VolverAjugar()
+        {
+            Pregunta = "";
+            Error = "";
+            MensajeElegir = "Tu turno de elegir";
+            Modo = null;
+            PersonajeElegido = new Personaje();
+            Enturno = false;
+            TurnoPreguntar = false;
+            TurnoResponder = false;
+            PuedesAdivinar = true;
+            Mensaje = "";
+            Turno = "";
+            HistorialChat.Clear();
+            ConPersonaje = true;
+            service.TerminarPatida();
+            VistaActual = TipoVista.SeleccionarPersonaje;
+            OnPropertyChanged(nameof(Pregunta));
+            OnPropertyChanged(nameof(Error));
+            OnPropertyChanged(nameof(MensajeElegir));
+            OnPropertyChanged(nameof(Modo));
+            OnPropertyChanged(nameof(PersonajeElegido));
+            OnPropertyChanged(nameof(Enturno));
+            OnPropertyChanged(nameof(TurnoPreguntar));
+            OnPropertyChanged(nameof(TurnoResponder));
+            OnPropertyChanged(nameof(PuedesAdivinar));
+            OnPropertyChanged(nameof(Mensaje));
+            OnPropertyChanged(nameof(Turno));
+            OnPropertyChanged(nameof(ConPersonaje));
         }
 
         private void Service_ClienteIntentoAdivinar()
@@ -235,15 +269,24 @@ namespace AdivinaQuienServidor.ViewModels
 
         private void Preguntar()
         {
-            service.EnviarPregunta(Pregunta);
-            Enturno = false;
-            TurnoPreguntar = false;
-            PuedesAdivinar = false;
-            Pregunta = "";
-            OnPropertyChanged(nameof(Enturno));
-            OnPropertyChanged(nameof(TurnoPreguntar));
-            OnPropertyChanged(nameof(Pregunta));
-            OnPropertyChanged(nameof(PuedesAdivinar));
+            if (Pregunta!="")
+            {
+                service.EnviarPregunta(Pregunta);
+                Enturno = false;
+                TurnoPreguntar = false;
+                PuedesAdivinar = false;
+                Pregunta = "";
+                OnPropertyChanged(nameof(Enturno));
+                OnPropertyChanged(nameof(TurnoPreguntar));
+                OnPropertyChanged(nameof(Pregunta));
+                OnPropertyChanged(nameof(PuedesAdivinar));
+            }
+            else
+            {
+                Error = "Manda una pregunta valida";
+                OnPropertyChanged(nameof(Error));
+            }
+            
         }
 
         private void Responder(string obj)
@@ -297,6 +340,8 @@ namespace AdivinaQuienServidor.ViewModels
             OnPropertyChanged(nameof(ConPersonaje));
             PersonajeElegido = ListaPersonajes.Where(x => x.Nombre == personaje).First();
             OnPropertyChanged(nameof(PersonajeElegido));
+            MensajeElegir = "Turno del cliente";
+            OnPropertyChanged(Error);
         }
 
         private void Service_JugadorConectado()
@@ -309,9 +354,19 @@ namespace AdivinaQuienServidor.ViewModels
 
         private void IrASala()
         {
-            VistaActual = TipoVista.SalaEspera;
-            service.AbrirSala(NombreServidor);
-            service.NickServidor = NombreServidor;
+            Error = "";
+            if (string.IsNullOrWhiteSpace(NombreServidor))
+            {
+                Error = "Utiliza un nombre valido";
+                OnPropertyChanged(nameof(Error));
+            }
+            if (Error=="")
+            {
+                VistaActual = TipoVista.SalaEspera;
+                service.AbrirSala(NombreServidor);
+                service.NickServidor = NombreServidor;
+            }
+           
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)

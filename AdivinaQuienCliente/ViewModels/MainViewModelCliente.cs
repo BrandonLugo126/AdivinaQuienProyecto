@@ -35,6 +35,8 @@ namespace AdivinaQuienCliente.ViewModels
         public object Modo { get; set; }
         public string Turno { get; set; }
         public string Mensaje { get;  set; }
+        public string Error { get; set; } = "";
+        public string MensajeElegir { get; set; } = "Turno del servidor";
 
 
         public bool Enturno { get; set; }
@@ -66,7 +68,7 @@ namespace AdivinaQuienCliente.ViewModels
         public ICommand VistaGanadaCommand { get; }
         public ICommand VistaPerdidaCommand { get; }
         public ICommand CambiarDeModoCommand { get; }
-
+        public ICommand VolverAJugarCommand { get; }
         Dispatcher HiloUi;
 
         public MainViewModelCliente()
@@ -81,7 +83,7 @@ namespace AdivinaQuienCliente.ViewModels
             ResponderCommand = new RelayCommand<string>(Responder);
             PreguntarCommand = new RelayCommand(Preguntar);
             CambiarDeModoCommand = new RelayCommand(CambiarModo);
-
+            VolverAJugarCommand = new RelayCommand(VolverAJugar);
 
             Service.JugadorConectado += Service_JugadorConectado;
             Service.PersonajeServidorElegido += Service_PersonajeServidorElegido;
@@ -93,12 +95,53 @@ namespace AdivinaQuienCliente.ViewModels
             Service.ClientePerdio += Service_ClientePerdio;
             Service.ClienteGano += Service_ClienteGano;
             Service.ServidorFallo += Service_ServidorFallo;
+            Service.LogActualizado += Service_LogActualizado;
             HiloUi = Dispatcher.CurrentDispatcher;
             foreach (var p in Service.Personajes)
             {
                 ListaPersonajes.Add(p);
             }
             VoltearCartaCommand = new RelayCommand<object>(VoltearCarta);
+        }
+
+        private void VolverAJugar()
+        {            
+            Pregunta = "";
+            Modo = null;
+            Turno = "";
+            Mensaje = "";
+            Error = "";
+            MensajeElegir = "Turno del servidor";
+            Enturno = false;
+            TurnoPreguntar = false;
+            TurnoResponder = false;
+            ConPersonaje = false;
+            PuedesAdivinar = false;
+            PersonajeElegido = new Personaje();
+            HistorialChat.Clear();
+            VistaActual = TipoVista.SeleccionarPersonaje;
+            OnPropertyChanged(nameof(Pregunta));
+            OnPropertyChanged(nameof(Error));
+            OnPropertyChanged(nameof(MensajeElegir));
+            OnPropertyChanged(nameof(Modo));
+            OnPropertyChanged(nameof(PersonajeElegido));
+            OnPropertyChanged(nameof(Enturno));
+            OnPropertyChanged(nameof(TurnoPreguntar));
+            OnPropertyChanged(nameof(TurnoResponder));
+            OnPropertyChanged(nameof(PuedesAdivinar));
+            OnPropertyChanged(nameof(Mensaje));
+            OnPropertyChanged(nameof(Turno));
+            OnPropertyChanged(nameof(ConPersonaje));
+        }
+
+        private void Service_LogActualizado(string obj)
+        {
+            HiloUi.BeginInvoke(() =>
+            {
+                VistaActual = TipoVista.Conexion;
+                Error = obj;
+                OnPropertyChanged(nameof(Error));
+            });
         }
 
         private void Service_ServidorFallo()
@@ -223,13 +266,23 @@ namespace AdivinaQuienCliente.ViewModels
 
         private void Preguntar()
         {
-            Service.EnviarPregunta(Pregunta);
-            TurnoPreguntar = false;
-            PuedesAdivinar=false;
-            Pregunta = "";
-            OnPropertyChanged(Pregunta);
-            OnPropertyChanged(nameof(TurnoPreguntar));
-            OnPropertyChanged(nameof(PuedesAdivinar));
+            Error = "";
+            if (Pregunta != "")
+            {
+                Service.EnviarPregunta(Pregunta);
+                TurnoPreguntar = false;
+                PuedesAdivinar = false;
+                Pregunta = "";
+                OnPropertyChanged(Pregunta);
+                OnPropertyChanged(nameof(TurnoPreguntar));
+                OnPropertyChanged(nameof(PuedesAdivinar));
+            }
+            else {
+                Error = "Ingrese una pregunta valida";
+                OnPropertyChanged(nameof(Error));
+
+            }
+
         }
 
         private void Responder(string obj)
@@ -277,8 +330,10 @@ namespace AdivinaQuienCliente.ViewModels
         {
 
             ConPersonaje = true;
+            MensajeElegir = "¡Tu turno de elegir!";
             Turno = $"Turno de {Service.Turno}";
             OnPropertyChanged(nameof(ConPersonaje));
+            OnPropertyChanged(nameof(MensajeElegir));
             OnPropertyChanged(nameof(Turno));
         }
 
@@ -320,8 +375,22 @@ namespace AdivinaQuienCliente.ViewModels
 
         private void IrASala()
         {
-            VistaActual = TipoVista.SeleccionarPersonaje;
-            Service.ConectarAlServidor(IPAddress.Parse(Ip), Nombre);
+            Error = "";
+            if (string.IsNullOrWhiteSpace(Nombre))
+            {
+                Error += "Tu nombre no debe de estar vacio\n";
+            }
+            if (!IPAddress.IsValid(Ip) || Ip == null)
+            {
+                Error += "Ip no valida";
+            }
+            if (Error=="")
+            {
+                VistaActual = TipoVista.SeleccionarPersonaje;
+                Service.ConectarAlServidor(IPAddress.Parse(Ip), Nombre);
+            }
+            OnPropertyChanged(nameof(Error));
+
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)

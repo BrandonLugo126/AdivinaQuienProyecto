@@ -47,11 +47,15 @@ namespace AdivinaQuienServidor.Services
         public string? NickPersonaje2 { get; set; }
         public string? Turno { get; set; } 
         public TcpClient ConexionJ2 { get; set; } = null!;
+       
+
 
         int puerto = 5000;
         bool juegoIniciado = false;
         bool Jugador2Conectado = false;
         public bool EnTurno;
+
+
         public string Pregunta { get; set; } = null!;
         public string Respuesta { get; set; } = null!;
 
@@ -65,13 +69,16 @@ namespace AdivinaQuienServidor.Services
 
         public void TerminarPatida()
         {
-            Personaje2 = "";
-            Personaje1 = "";
-            Turno = "";
-            Respuesta = "";
-            Pregunta = "";
             HistorialPyR.Clear();
-
+            Personaje1 = null;
+            Personaje2 = null;
+            Turno = null;
+            puerto = 5000;
+            juegoIniciado = false;
+            EnTurno = false;
+            Pregunta = null!;
+            Respuesta = null!;
+            
 
         }
         public void AbrirSala(string nombre)

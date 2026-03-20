@@ -29,6 +29,7 @@ namespace AdivinaQuienCliente.Services
         public event Action? PartidaTerminada;
         public event Action<string>? TurnoCambiado;
         public event Action? ServidorFallo;
+        public event Action<string>? LogActualizado;
 
         public bool Enturno;
 
@@ -62,31 +63,49 @@ namespace AdivinaQuienCliente.Services
             new Personaje { Nombre = "Ximena", ImagenUrl = "/AdivinaQuienCliente;component/Assets/Ximena.png" }
         };
 
+        public void TerminarPartida()
+        {
+            Personaje = "";
+            Turno = "";
+            MensajeError = "";
+            Enturno = false;
+            HistorialPyR.Clear();
+
+        }
         public void ConectarAlServidor(IPAddress IP, string nombre)
 
         {
-
-            if (cliente == null)
+            try
             {
-                cliente = new();
-                IPEndPoint endPoint = new(IP, puerto);
-                cliente.Connect(endPoint);
-
-                if (cliente.Connected)
+                if (cliente == null)
                 {
-                    Nick = nombre;
-                    var comando = new ConectarCommando
-                    {
-                        Comamando = Orden.Conectar,
-                        Nombre = nombre
-                    };
-                    Thread hilo = new Thread(EscucharServidor);
-                    hilo.IsBackground = true;
-                    hilo.Start();
-                    EnviarCommando(comando, cliente);
+                    cliente = new();
+                    IPEndPoint endPoint = new(IP, puerto);
+                    cliente.Connect(endPoint);
 
+                    if (cliente.Connected)
+                    {
+                        Nick = nombre;
+                        var comando = new ConectarCommando
+                        {
+                            Comamando = Orden.Conectar,
+                            Nombre = nombre
+                        };
+                        Thread hilo = new Thread(EscucharServidor);
+                        hilo.IsBackground = true;
+                        hilo.Start();
+                        EnviarCommando(comando, cliente);
+
+                    }
                 }
             }
+            catch (Exception)
+            {
+                MensajeError = "Servidor No encontrado";
+                LogActualizado?.Invoke(MensajeError);
+            }
+
+           
         }
 
         public void CambiarDeTurno()
