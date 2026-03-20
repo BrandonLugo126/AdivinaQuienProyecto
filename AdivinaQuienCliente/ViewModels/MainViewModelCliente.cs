@@ -93,12 +93,25 @@ namespace AdivinaQuienCliente.ViewModels
             Service.ServidorGano += Service_ServidorGano ;
             Service.ClientePerdio += Service_ClientePerdio;
             Service.ClienteGano += Service_ClienteGano;
+            Service.ServidorFallo += Service_ServidorFallo;
             HiloUi = Dispatcher.CurrentDispatcher;
             foreach (var p in Service.Personajes)
             {
                 ListaPersonajes.Add(p);
             }
             VoltearCartaCommand = new RelayCommand<object>(VoltearCarta);
+        }
+
+        private void Service_ServidorFallo()
+        {
+            HiloUi.BeginInvoke(() =>
+            {
+                TurnoPreguntar = true;
+                PuedesAdivinar = true;
+                OnPropertyChanged(nameof(TurnoPreguntar));
+                OnPropertyChanged(nameof(PuedesAdivinar));
+
+            });
         }
 
         private void Service_ClientePerdio(string obj)
@@ -136,9 +149,9 @@ namespace AdivinaQuienCliente.ViewModels
             HiloUi.BeginInvoke(() =>
             {
                 Enturno = true;
-                TurnoPreguntar = true;
+                TurnoPreguntar = false;
                 TurnoResponder = false;
-                PuedesAdivinar = true;
+                PuedesAdivinar = false;
                 OnPropertyChanged(nameof(Enturno));
                 OnPropertyChanged(nameof(TurnoPreguntar));
                 OnPropertyChanged(nameof(TurnoResponder));
@@ -159,7 +172,19 @@ namespace AdivinaQuienCliente.ViewModels
                 //    TurnoResponder = false;
                 //    PuedesAdivinar = true;
                 //    OnPropertyChanged(nameof(Enturno));
-
+                if (Nombre == obj)
+                {
+                    PuedesAdivinar = true;
+                    TurnoPreguntar = true;
+                    TurnoResponder = false;
+                }
+                else
+                {
+                    PuedesAdivinar = false;
+                    TurnoPreguntar = false;
+                    TurnoResponder = false;
+                }
+                OnPropertyChanged();
                 //    OnPropertyChanged(nameof(TurnoPreguntar));
                 //    OnPropertyChanged(nameof(TurnoResponder));
                 //    OnPropertyChanged(nameof(PuedesAdivinar));
@@ -185,10 +210,13 @@ namespace AdivinaQuienCliente.ViewModels
 
         private void Service_ServidorPregunto()
         {
+            Enturno = true;
             TurnoResponder = true;
             TurnoPreguntar = false;
+            PuedesAdivinar = false;
 
-            OnPropertyChanged(nameof(Turno));
+            OnPropertyChanged(nameof(PuedesAdivinar));
+            OnPropertyChanged(nameof(Enturno));
             OnPropertyChanged(nameof(TurnoResponder));
             OnPropertyChanged(nameof(TurnoPreguntar));
         }
@@ -206,9 +234,11 @@ namespace AdivinaQuienCliente.ViewModels
         {
             Service.EnviarPregunta(Pregunta);
             TurnoPreguntar = false;
+            PuedesAdivinar=false;
             Pregunta = "";
             OnPropertyChanged(Pregunta);
             OnPropertyChanged(nameof(TurnoPreguntar));
+            OnPropertyChanged(nameof(PuedesAdivinar));
         }
 
         private void Responder(string obj)
@@ -226,7 +256,7 @@ namespace AdivinaQuienCliente.ViewModels
             Service.CambiarDeTurno();
             TurnoResponder = false;
             TurnoPreguntar = true;
-            PuedesAdivinar = false;
+            PuedesAdivinar = true;
             OnPropertyChanged(nameof(TurnoResponder));
             OnPropertyChanged(nameof(TurnoPreguntar));
             OnPropertyChanged(nameof(PuedesAdivinar));
@@ -284,6 +314,7 @@ namespace AdivinaQuienCliente.ViewModels
             Service.SeleccionarPersonaje(nombre);
             VistaActual = TipoVista.Juego;
             PersonajeElegido = ListaPersonajes.Where(x => x.Nombre == nombre).First();
+            Service.Personaje = PersonajeElegido.Nombre;
             OnPropertyChanged(nameof(PersonajeElegido));
             Turno = $"Turno de {Service.Turno}";
             OnPropertyChanged(nameof(Turno));

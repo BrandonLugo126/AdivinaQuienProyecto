@@ -113,6 +113,7 @@ namespace AdivinaQuienServidor.Services
         {
             if (Jugador2Conectado && ConexionJ2 != null)
             {
+                
                 if (Turno == NickServidor && !string.IsNullOrWhiteSpace(Pregunta))
                 {
                     HistorialPyR.Add($"{NickServidor}: {Pregunta}");
@@ -192,6 +193,17 @@ namespace AdivinaQuienServidor.Services
                     Ganador?.Invoke(commandoC.NombreGanador);
                     TerminarPatida();
                 }
+                else
+                {
+                    var comando = new TerminarTurnoCommando()
+                    {
+                        Comamando = Orden.TerminarTurno,
+                        JugadorTurno = NickPersonaje2 ?? ""
+                    };
+                    EnviarComando(ConexionJ2, comando);
+                    TurnoCambiado?.Invoke(NickPersonaje2 ?? "");
+                    ChatActualizado?.Invoke($"{Turno} ha intentado adivinar y ha fallado.");
+                }
              
             }
             else
@@ -229,7 +241,7 @@ namespace AdivinaQuienServidor.Services
         public void ProcesarRespuesta(bool respuesta)
         {
             string Respues = respuesta ? "Si" : "No";
-            ChatActualizado?.Invoke($"{Turno}:{Respues}");
+            ChatActualizado?.Invoke($"{NickServidor}:{Respues}");
             var commando = new RespuestaCommando()
             {
                 Comamando = Orden.EsperarRespuesta,
@@ -332,7 +344,7 @@ namespace AdivinaQuienServidor.Services
                                         var preg = JsonSerializer.Deserialize<PreguntaCommando>(json);
                                         if (preg != null)
                                         {
-                                            ChatActualizado?.Invoke($"{preg.Quien}: {preg.Pregunta}");
+                                            ChatActualizado?.Invoke($"{NickPersonaje2}: {preg.Pregunta}");
                                             ClientePregunto?.Invoke();
                                             EnTurno = false;
                                         }

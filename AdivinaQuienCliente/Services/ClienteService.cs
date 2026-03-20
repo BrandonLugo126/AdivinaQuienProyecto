@@ -28,6 +28,7 @@ namespace AdivinaQuienCliente.Services
         public event Action? ServidorPregunto, ServidorRespondio;
         public event Action? PartidaTerminada;
         public event Action<string>? TurnoCambiado;
+        public event Action? ServidorFallo;
 
         public bool Enturno;
 
@@ -169,7 +170,7 @@ namespace AdivinaQuienCliente.Services
                                         {
                                             var res = respuesta.Respuesta ? "Si" : "No";
                                             HistorialPyR.Add($"{respuesta.Quien}: {res}");
-                                            ChatActualizado?.Invoke($"{respuesta.Quien}: {res}");
+                                            ChatActualizado?.Invoke($"{NickServer}: {res}");
                                             CambiarDeTurno();
                                             ServidorRespondio?.Invoke();
                                         }
@@ -180,7 +181,7 @@ namespace AdivinaQuienCliente.Services
                                         {
                                             HistorialPyR.Add($"{pregunta.Quien}: {pregunta.Pregunta}");
                                             NickServer = pregunta.Quien;
-                                            ChatActualizado?.Invoke($"{pregunta.Quien}: {pregunta.Pregunta}");
+                                            ChatActualizado?.Invoke($"{NickServer}: {pregunta.Pregunta}");
                                             ServidorPregunto?.Invoke();
                                         }
                                         break;
@@ -220,7 +221,12 @@ namespace AdivinaQuienCliente.Services
                                         if (terminarTurno != null)
                                         {
                                             Turno = terminarTurno.JugadorTurno;
-
+                                            if (Personaje!="" && Turno==Nick)
+                                            {
+                                                ChatActualizado?.Invoke($"{Turno} ha intentado adivinar y ha fallado.");
+                                                ServidorFallo?.Invoke();
+                                            }
+                                       
                                         }
                                         break;
                                     default:
@@ -243,7 +249,7 @@ namespace AdivinaQuienCliente.Services
             if (cliente != null)
             {
                 string Respues = respuesta ? "Si" : "No";
-                ChatActualizado?.Invoke($"{Turno}:{Respues}");
+                ChatActualizado?.Invoke($"{Nick}:{Respues}");
                 var commando = new RespuestaCommando()
                 {
                     Quien = Nick,

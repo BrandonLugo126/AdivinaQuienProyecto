@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Drawing.Imaging;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Documents;
@@ -94,7 +95,7 @@ namespace AdivinaQuienServidor.ViewModels
                 Enturno = false;
                 TurnoPreguntar = false;
                 TurnoResponder = false;
-                PuedesAdivinar = false;
+                PuedesAdivinar = false;              
                 Turno = $"Turno de {service.Turno}";
                 OnPropertyChanged(nameof(Turno));
                 OnPropertyChanged(nameof(Enturno));
@@ -108,6 +109,7 @@ namespace AdivinaQuienServidor.ViewModels
         {
             HiloUi.BeginInvoke(() =>
             {
+                Enturno = true;
                 TurnoResponder = true;
                 TurnoPreguntar = false;
                 PuedesAdivinar = false;
@@ -131,7 +133,19 @@ namespace AdivinaQuienServidor.ViewModels
                 //    TurnoResponder = false;
                 //    PuedesAdivinar = true;
                 //    OnPropertyChanged(nameof(Enturno));
-                OnPropertyChanged(nameof(Turno));
+                if (NombreServidor==obj)
+                {
+                    PuedesAdivinar = true;
+                    TurnoPreguntar = true;
+                    TurnoResponder = false;
+                }
+                else
+                {
+                    PuedesAdivinar = false;
+                    TurnoPreguntar = false;
+                    TurnoResponder = false;
+                }
+                OnPropertyChanged();
                 //    OnPropertyChanged(nameof(TurnoPreguntar));
                 //    OnPropertyChanged(nameof(TurnoResponder));
                 //    OnPropertyChanged(nameof(PuedesAdivinar));
@@ -230,6 +244,7 @@ namespace AdivinaQuienServidor.ViewModels
         private void Preguntar()
         {
             service.EnviarPregunta(Pregunta);
+            Enturno = false;
             TurnoPreguntar = false;
             PuedesAdivinar = false;
             Pregunta = "";
@@ -241,7 +256,7 @@ namespace AdivinaQuienServidor.ViewModels
 
         private void Responder(string obj)
         {
-            bool respuesta;
+            bool respuesta = false;
             if (obj == "Si")
             {
                 respuesta = true;
@@ -251,11 +266,15 @@ namespace AdivinaQuienServidor.ViewModels
                 respuesta = false;
             }
             service.ProcesarRespuesta(respuesta);
+            service.CambiarDeTurno();
             TurnoResponder = false;
-            TurnoPreguntar = false;
+            TurnoPreguntar = true;
+            PuedesAdivinar = true;
             OnPropertyChanged(nameof(TurnoResponder));
             OnPropertyChanged(nameof(TurnoPreguntar));
-            service.CambiarDeTurno();
+            OnPropertyChanged(nameof(PuedesAdivinar));
+            Turno = $"Turno de {NombreServidor}";
+            OnPropertyChanged(nameof(Turno));
 
         }
 
@@ -263,7 +282,7 @@ namespace AdivinaQuienServidor.ViewModels
         {
             service.IntentarAdivinar(obj);
             service.CambiarDeTurno();
-
+            Turno = $"Turno de {service.Turno}";
 
         }
         private void VistaPerdida()
@@ -298,6 +317,7 @@ namespace AdivinaQuienServidor.ViewModels
         {
             VistaActual = TipoVista.SalaEspera;
             service.AbrirSala(NombreServidor);
+            service.NickServidor = NombreServidor;
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
