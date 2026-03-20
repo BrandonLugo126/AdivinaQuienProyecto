@@ -219,7 +219,7 @@ namespace AdivinaQuienServidor.Services
                     };
                     EnviarComando(ConexionJ2, comando);
                     TurnoCambiado?.Invoke(NickPersonaje2 ?? "");
-                    ChatActualizado?.Invoke($"{Turno} ha intentado adivinar y ha fallado.");
+                    ChatActualizado?.Invoke($"Han intentado adivinar y han fallado.");
                 }
             }
         }
