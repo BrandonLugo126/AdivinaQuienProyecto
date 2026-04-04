@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing.Imaging;
+using System.Media;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Documents;
@@ -50,6 +51,11 @@ namespace AdivinaQuienServidor.ViewModels
             get => _vistaActual;
             set { _vistaActual = value; OnPropertyChanged(); }
         }
+
+        SoundPlayer Ganar = new SoundPlayer("C:\\Users\\kaipr\\source\\repos\\AdivinaQuienProyecto\\AdivinaQuienServidor\\Assets\\Sounds\\Cheer Sound.wav");
+        SoundPlayer Perder = new SoundPlayer("C:\\Users\\kaipr\\source\\repos\\AdivinaQuienProyecto\\AdivinaQuienServidor\\Assets\\Sounds\\buzzer.wav");
+        SoundPlayer Click = new SoundPlayer("C:\\Users\\kaipr\\source\\repos\\AdivinaQuienProyecto\\AdivinaQuienServidor\\Assets\\Sounds\\CLICK.wav");
+
         public ICommand IniciarPartidaCommand { get; set; }
 
         public ICommand SeleccionarPersonajeCommand { get; }
@@ -121,6 +127,7 @@ namespace AdivinaQuienServidor.ViewModels
             OnPropertyChanged(nameof(Mensaje));
             OnPropertyChanged(nameof(Turno));
             OnPropertyChanged(nameof(ConPersonaje));
+            Click.Play();
         }
 
         private void Service_ClienteIntentoAdivinar()
@@ -203,6 +210,7 @@ namespace AdivinaQuienServidor.ViewModels
             OnPropertyChanged(nameof(PuedesAdivinar));
             OnPropertyChanged(nameof(TurnoResponder));
             OnPropertyChanged(nameof(TurnoPreguntar));
+            Click.Play();
 
         }
 
@@ -213,10 +221,12 @@ namespace AdivinaQuienServidor.ViewModels
                 if (NombreServidor == obj)
                 {
                     VistaActual = TipoVista.Victoria;
+                    Ganar.Play();
                 }
                 else
                 {
                     VistaActual = TipoVista.Derrota;
+                    Perder.Play();
                 }
             }
         }
@@ -241,6 +251,8 @@ namespace AdivinaQuienServidor.ViewModels
 
                 bool estadoActual = bool.Parse(btn.Tag.ToString());
                 btn.Tag = (!estadoActual).ToString();
+                Click.Play();
+
             }
         }
         private void Service_ChatActualizado(string obj)
@@ -286,7 +298,8 @@ namespace AdivinaQuienServidor.ViewModels
                 Error = "Manda una pregunta valida";
                 OnPropertyChanged(nameof(Error));
             }
-            
+            Click.Play();
+
         }
 
         private void Responder(string obj)
@@ -310,6 +323,7 @@ namespace AdivinaQuienServidor.ViewModels
             OnPropertyChanged(nameof(PuedesAdivinar));
             Turno = $"Turno de {NombreServidor}";
             OnPropertyChanged(nameof(Turno));
+            Click.Play();
 
         }
 
@@ -320,6 +334,7 @@ namespace AdivinaQuienServidor.ViewModels
             Turno = $"Turno de {service.Turno}";
             Modo = null;
             OnPropertyChanged(nameof(Modo));
+            Click.Play();
 
         }
         private void VistaPerdida()
@@ -342,6 +357,8 @@ namespace AdivinaQuienServidor.ViewModels
             OnPropertyChanged(nameof(PersonajeElegido));
             MensajeElegir = "Turno del cliente";
             OnPropertyChanged(Error);
+            Click.Play();
+
         }
 
         private void Service_JugadorConectado()
@@ -366,7 +383,8 @@ namespace AdivinaQuienServidor.ViewModels
                 service.AbrirSala(NombreServidor);
                 service.NickServidor = NombreServidor;
             }
-           
+            Click.Play();
+
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)

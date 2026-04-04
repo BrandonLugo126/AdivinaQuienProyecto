@@ -16,6 +16,9 @@
     <None Remove="Assets\Gael.png" />
     <None Remove="Assets\Jesús.png" />
     <None Remove="Assets\Miguel.png" />
+    <None Remove="Assets\Sounds\buzzer.wav" />
+    <None Remove="Assets\Sounds\Cheer Sound.wav" />
+    <None Remove="Assets\Sounds\CLICK.WAV" />
   </ItemGroup>
 
   <ItemGroup>
@@ -93,6 +96,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\Ximena.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Sounds\buzzer.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Sounds\Cheer Sound.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Sounds\CLICK.WAV">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

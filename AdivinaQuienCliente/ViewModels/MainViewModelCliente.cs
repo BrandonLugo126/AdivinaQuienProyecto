@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Media;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -55,6 +56,10 @@ namespace AdivinaQuienCliente.ViewModels
             set { _vistaActual = value; OnPropertyChanged(); }
         }
 
+
+        SoundPlayer Ganar = new SoundPlayer("C:\\Users\\kaipr\\source\\repos\\AdivinaQuienProyecto\\AdivinaQuienCliente\\Assets\\Sounds\\Cheer Sound.wav");
+        SoundPlayer Perder = new SoundPlayer("C:\\Users\\kaipr\\source\\repos\\AdivinaQuienProyecto\\AdivinaQuienCliente\\Assets\\Sounds\\buzzer.wav");
+        SoundPlayer Click = new SoundPlayer("C:\\Users\\kaipr\\source\\repos\\AdivinaQuienProyecto\\AdivinaQuienCliente\\Assets\\Sounds\\CLICK.WAV");
 
         public ICommand VoltearCartaCommand { get; }
 
@@ -132,6 +137,8 @@ namespace AdivinaQuienCliente.ViewModels
             OnPropertyChanged(nameof(Mensaje));
             OnPropertyChanged(nameof(Turno));
             OnPropertyChanged(nameof(ConPersonaje));
+            Click.Play();
+            
         }
 
         private void Service_LogActualizado(string obj)
@@ -162,6 +169,7 @@ namespace AdivinaQuienCliente.ViewModels
             {
                 Mensaje = obj;
                 VistaActual = TipoVista.Derrota;
+                Perder.Play();
                 OnPropertyChanged(Mensaje);
             });
         }
@@ -171,6 +179,7 @@ namespace AdivinaQuienCliente.ViewModels
             HiloUi.BeginInvoke(() =>
             {
                 Mensaje = obj;
+                Ganar.Play();
                 VistaActual = TipoVista.Victoria;
                 OnPropertyChanged(Mensaje);
             });
@@ -183,6 +192,7 @@ namespace AdivinaQuienCliente.ViewModels
                 VistaActual = TipoVista.Derrota;
                 Mensaje = servidorGano;
                 OnPropertyChanged(Mensaje);
+                Perder.Play();
 
             });
         }
@@ -240,6 +250,7 @@ namespace AdivinaQuienCliente.ViewModels
             OnPropertyChanged(nameof(PuedesAdivinar));
             OnPropertyChanged(nameof(TurnoResponder));
             OnPropertyChanged(nameof(TurnoPreguntar));
+            Click.Play();
         }
 
         private void Service_ServidorPregunto()
@@ -282,7 +293,7 @@ namespace AdivinaQuienCliente.ViewModels
                 OnPropertyChanged(nameof(Error));
 
             }
-
+            Click.Play();
         }
 
         private void Responder(string obj)
@@ -306,6 +317,7 @@ namespace AdivinaQuienCliente.ViewModels
             OnPropertyChanged(nameof(PuedesAdivinar));
             Turno = $"Turno de {Nombre}";
             OnPropertyChanged(nameof(Turno));
+            Click.Play();
         }
 
         private void AdivinarPersonaje(string obj)
@@ -314,6 +326,7 @@ namespace AdivinaQuienCliente.ViewModels
             Service.CambiarDeTurno();
             Modo = null;
             OnPropertyChanged(nameof(Modo));
+            Click.Play();
         }
 
         private void VoltearCarta(object param)
@@ -324,6 +337,7 @@ namespace AdivinaQuienCliente.ViewModels
               
                 bool estadoActual = bool.Parse(btn.Tag.ToString());
                 btn.Tag = (!estadoActual).ToString();
+                Click.Play();
             }
         }
         private void Service_PersonajeServidorElegido()
@@ -366,6 +380,7 @@ namespace AdivinaQuienCliente.ViewModels
             OnPropertyChanged(nameof(PersonajeElegido));
             Turno = $"Turno de {Service.Turno}";
             OnPropertyChanged(nameof(Turno));
+            Click.Play();
         }
 
         private void VolverAConexion()
@@ -390,6 +405,7 @@ namespace AdivinaQuienCliente.ViewModels
                 Service.ConectarAlServidor(IPAddress.Parse(Ip), Nombre);
             }
             OnPropertyChanged(nameof(Error));
+            Click.Play();
 
         }
 
