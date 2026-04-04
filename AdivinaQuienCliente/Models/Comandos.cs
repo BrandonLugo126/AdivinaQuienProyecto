@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AdivinaQuienServidor.Models
 {
-    public enum Orden { Conectar, SeleccionarPersonaje, EsperarRespuesta, Preguntar, TerminarPartida, AdivinarPersonaje,TerminarTurno }
+    public enum Orden { Conectar, SeleccionarPersonaje, EsperarRespuesta, Preguntar, TerminarPartida, AdivinarPersonaje,TerminarTurno, Rechazar }
     public class Comandos
     {
         public Orden Comamando { get; set; }
@@ -12,6 +12,9 @@ namespace AdivinaQuienServidor.Models
     public class ConectarCommando : Comandos
     {
         public string Nombre { get; set; } = null!;
+    }
+    public class RechazarConexionCommando : Comandos
+    {       
     }
     public class SeleccionarPersonajeCommando : Comandos
     {

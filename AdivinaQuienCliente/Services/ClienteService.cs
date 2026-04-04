@@ -105,12 +105,12 @@ namespace AdivinaQuienCliente.Services
                 LogActualizado?.Invoke(MensajeError);
             }
 
-           
+
         }
 
         public void CambiarDeTurno()
         {
-           
+
             if (Turno == NickServer)
             {
                 Turno = Nick;
@@ -224,13 +224,25 @@ namespace AdivinaQuienCliente.Services
                                         if (terminarTurno != null)
                                         {
                                             Turno = terminarTurno.JugadorTurno;
-                                            if (Personaje!="" && Turno==Nick && terminarTurno.IntentoAdivinar==true)
+                                            if (Personaje != "" && Turno == Nick && terminarTurno.IntentoAdivinar == true)
                                             {
                                                 ChatActualizado?.Invoke($"han intentado adivinar y han fallado.");
                                                 ServidorFallo?.Invoke();
                                             }
-                                       
+
                                         }
+                                        break;
+                                    case Orden.Rechazar:
+                                        var rechazar = JsonSerializer.Deserialize<RechazarConexionCommando>(json);
+                                        if (rechazar != null)
+                                        {
+                                           MensajeError ="Nombre ya en uso";
+                                            LogActualizado?.Invoke(MensajeError);
+                                            cliente.Close();
+                                            cliente = null;
+                                            return;
+                                        }
+
                                         break;
                                     default:
                                         break;
@@ -304,7 +316,7 @@ namespace AdivinaQuienCliente.Services
                 {
                     Comamando = Orden.AdivinarPersonaje,
                     PersonajeAdivinado = personaje,
-                    
+
                 };
                 EnviarCommando(commando, cliente);
             }

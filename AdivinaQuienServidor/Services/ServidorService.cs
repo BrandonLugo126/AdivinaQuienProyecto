@@ -264,9 +264,19 @@ namespace AdivinaQuienServidor.Services
 
                     var ConectarCommand = JsonSerializer.Deserialize<ConectarCommando>(json);
 
-
+                    
                     if (ConectarCommand != null)
                     {
+                        if (ConectarCommand.Nombre == NickServidor)
+                        {
+                            RechazarConexionCommando rechazar = new RechazarConexionCommando()
+                            {
+                                Comamando = Orden.Rechazar,                                
+                            };
+                            EnviarComando(clieneNuevo, rechazar);
+                            clieneNuevo.Close();
+                            clieneNuevo = null;
+                        }
                         NickPersonaje2 = ConectarCommand.Nombre;
                         Personaje2 = null;
                         Cliente cliente = new Cliente()
