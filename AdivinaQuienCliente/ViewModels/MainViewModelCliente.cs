@@ -101,12 +101,27 @@ namespace AdivinaQuienCliente.ViewModels
             Service.ClienteGano += Service_ClienteGano;
             Service.ServidorFallo += Service_ServidorFallo;
             Service.LogActualizado += Service_LogActualizado;
+            Service.PartidaTerminada += Service_PartidaTerminada;
             HiloUi = Dispatcher.CurrentDispatcher;
             foreach (var p in Service.Personajes)
             {
                 ListaPersonajes.Add(p);
             }
             VoltearCartaCommand = new RelayCommand<object>(VoltearCarta);
+        }
+
+        private void Service_PartidaTerminada()
+        {
+            HiloUi.BeginInvoke(() =>
+            {
+              
+                VolverAJugar();
+                Nombre = "";
+                Mensaje = Service.MensajeError;
+                OnPropertyChanged(Nombre);
+                OnPropertyChanged(Mensaje);
+                VistaActual = TipoVista.Conexion;
+            });
         }
 
         private void VolverAJugar()

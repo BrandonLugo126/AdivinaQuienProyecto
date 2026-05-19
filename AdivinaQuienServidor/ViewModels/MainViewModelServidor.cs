@@ -30,18 +30,18 @@ namespace AdivinaQuienServidor.ViewModels
         private TipoVista _vistaActual = TipoVista.Inicio;
         ServidorService service = new();
 
-        public string NombreServidor { get; set; }
+        public string? NombreServidor { get; set; }
         public string Pregunta { get; set; } = "";
         public string Error { get; set; } = "";
         public string MensajeElegir { get; set; } = "Tu turno de elegir";
-        public object Modo { get; set; }
+        public object? Modo { get; set; }
         public Personaje? PersonajeElegido { get; set; } = new Personaje();
         public bool Enturno { get; set; }
         public bool TurnoPreguntar { get; set; }
         public bool TurnoResponder { get; set; }
         public bool PuedesAdivinar { get; set; } = true;
-        public string Mensaje { get; set; }
-        public string Turno { get; set; }
+        public string? Mensaje { get; set; }
+        public string? Turno { get; set; }
         public ObservableCollection<Personaje> ListaPersonajes { get; set; } = new();
         public ObservableCollection<string> HistorialChat { get; set; } = new();
         Dispatcher HiloUi;
@@ -76,6 +76,7 @@ namespace AdivinaQuienServidor.ViewModels
             {
                 ListaPersonajes.Add(p);
             }
+            service.JugadorDesconectado += Service_JugadorDesconectado;
             service.JugadorConectado += Service_JugadorConectado;
             service.JuegoListoParaIniciar += Service_JuegoListoParaIniciar;
             service.ChatActualizado += Service_ChatActualizado;
@@ -96,6 +97,19 @@ namespace AdivinaQuienServidor.ViewModels
             VolverAJugarCommand = new RelayCommand(VolverAjugar);
             HiloUi = Dispatcher.CurrentDispatcher;
 
+        }
+
+        private void Service_JugadorDesconectado()
+        {
+            HiloUi.BeginInvoke(() =>
+           {
+
+               VolverAjugar();
+               Error = "El cliente se ha desconectado";
+               OnPropertyChanged(nameof(Error));
+               VistaActual = TipoVista.SalaEspera;
+
+           });
         }
 
         private void VolverAjugar()
@@ -127,6 +141,7 @@ namespace AdivinaQuienServidor.ViewModels
             OnPropertyChanged(nameof(Mensaje));
             OnPropertyChanged(nameof(Turno));
             OnPropertyChanged(nameof(ConPersonaje));
+            OnPropertyChanged(nameof(HistorialChat));
             Click.Play();
         }
 
@@ -149,7 +164,7 @@ namespace AdivinaQuienServidor.ViewModels
                 Enturno = false;
                 TurnoPreguntar = false;
                 TurnoResponder = false;
-                PuedesAdivinar = false;              
+                PuedesAdivinar = false;
                 Turno = $"Turno de {service.Turno}";
                 OnPropertyChanged(nameof(Turno));
                 OnPropertyChanged(nameof(Enturno));
@@ -180,8 +195,8 @@ namespace AdivinaQuienServidor.ViewModels
             {
 
                 Turno = $"Turno de {obj}";
-               
-                if (NombreServidor==obj)
+
+                if (NombreServidor == obj)
                 {
                     PuedesAdivinar = true;
                     TurnoPreguntar = true;
@@ -194,7 +209,7 @@ namespace AdivinaQuienServidor.ViewModels
                     TurnoResponder = false;
                 }
                 OnPropertyChanged();
-               
+
             });
         }
 
@@ -272,6 +287,7 @@ namespace AdivinaQuienServidor.ViewModels
         private void Service_JuegoListoParaIniciar()
         {
             VistaActual = TipoVista.Juego;
+            HistorialChat.Clear();
             Enturno = true;
             TurnoPreguntar = true;
             OnPropertyChanged(nameof(Enturno));
@@ -281,7 +297,7 @@ namespace AdivinaQuienServidor.ViewModels
 
         private void Preguntar()
         {
-            if (Pregunta!="")
+            if (Pregunta != "")
             {
                 service.EnviarPregunta(Pregunta);
                 Enturno = false;
@@ -377,14 +393,13 @@ namespace AdivinaQuienServidor.ViewModels
                 Error = "Utiliza un nombre valido";
                 OnPropertyChanged(nameof(Error));
             }
-            if (Error=="")
+            if (Error == ""&& NombreServidor != null)
             {
                 VistaActual = TipoVista.SalaEspera;
                 service.AbrirSala(NombreServidor);
                 service.NickServidor = NombreServidor;
             }
             Click.Play();
-
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)

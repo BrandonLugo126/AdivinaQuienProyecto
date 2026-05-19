@@ -139,124 +139,126 @@ namespace AdivinaQuienCliente.Services
 
         private void EscucharServidor(object? obj)
         {
-            if (cliente != null)
+            if (cliente == null) return;
+
+            NetworkStream stream = cliente.GetStream();
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+
+            try
             {
-                try
+                while (cliente.Connected)
                 {
-                    while (cliente.Connected)
+                    // Lectura bloqueante: se detiene hasta que lleguen datos o el servidor cierre la conexión.
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    if (bytesRead == 0)
                     {
-                        if (cliente.Available > 0)
+                        // El servidor cerró la conexión de forma ordenada.
+                        break;
+                    }
+
+                    var json = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    var comando = JsonSerializer.Deserialize<Comandos>(json);
+                    if (comando != null)
+                    {
+                        switch (comando.Comamando)
                         {
-                            var stream = cliente.GetStream();
-                            var buffer = new byte[cliente.Available];
-                            stream.ReadExactly(buffer, 0, buffer.Length);
-                            var json = Encoding.UTF8.GetString(buffer);
-                            var comando = JsonSerializer.Deserialize<Comandos>(json);
-                            if (comando != null)
-                            {
-                                switch (comando.Comamando)
+                            case Orden.Conectar:
+                                JugadorConectado?.Invoke();
+                                break;
+                            case Orden.SeleccionarPersonaje:
+                                var personajeSeleccionado = JsonSerializer.Deserialize<SeleccionarPersonajeCommando>(json);
+                                if (personajeSeleccionado != null)
+                                    PersonajeServidorElegido?.Invoke();
+                                CambiarDeTurno();
+                                break;
+                            case Orden.EsperarRespuesta:
+                                var respuesta = JsonSerializer.Deserialize<RespuestaCommando>(json);
+                                if (respuesta != null)
                                 {
-                                    case Orden.Conectar:
-                                        JugadorConectado?.Invoke();
-                                        break;
-                                    case Orden.SeleccionarPersonaje:
-                                        var personajeSeleccionado = JsonSerializer.Deserialize<SeleccionarPersonajeCommando>(json);
-                                        if (personajeSeleccionado != null)
-                                        {
-                                            PersonajeServidorElegido?.Invoke();
-                                        }
-                                        CambiarDeTurno();
-                                        break;
-                                    case Orden.EsperarRespuesta:
-                                        var respuesta = JsonSerializer.Deserialize<RespuestaCommando>(json);
-                                        if (respuesta != null)
-                                        {
-                                            var res = respuesta.Respuesta ? "Si" : "No";
-                                            HistorialPyR.Add($"{respuesta.Quien}: {res}");
-                                            ChatActualizado?.Invoke($"{NickServer}: {res}");
-                                            CambiarDeTurno();
-                                            ServidorRespondio?.Invoke();
-                                        }
-                                        break;
-                                    case Orden.Preguntar:
-                                        var pregunta = JsonSerializer.Deserialize<PreguntaCommando>(json);
-                                        if (pregunta != null)
-                                        {
-                                            HistorialPyR.Add($"{pregunta.Quien}: {pregunta.Pregunta}");
-                                            NickServer = pregunta.Quien;
-                                            ChatActualizado?.Invoke($"{NickServer}: {pregunta.Pregunta}");
-                                            ServidorPregunto?.Invoke();
-                                        }
-                                        break;
-                                    case Orden.TerminarPartida:
-                                        var terminarPartida = JsonSerializer.Deserialize<TerminarPartidaCommando>(json);
-                                        if (terminarPartida != null)
-                                        {
-                                            Turno = terminarPartida.NombreGanador;
-                                            if (terminarPartida.NombreGanador == Nick)
-                                            {
-                                                ClienteGano?.Invoke($"Felizidades {Nick} ganaste el personaje de {NickServer} era {terminarPartida.PersonajeJ1}");
-                                            }
-                                            else
-                                            {
-                                                ClientePerdio?.Invoke($"Lo siento Has perdido el {terminarPartida.NombreGanador} ha ganado su personaje era {terminarPartida.PersonajeJ1}");
-
-                                            }
-
-                                        }
-                                        break;
-                                    case Orden.AdivinarPersonaje:
-                                        var adivinar = JsonSerializer.Deserialize<AdivinarPersonajeCommando>(json);
-                                        if (adivinar != null)
-                                        {
-                                            if (adivinar.PersonajeAdivinado == Personaje)
-                                            {
-                                                ServidorGano?.Invoke($"{NickServer} ha adivinado tu personaje {adivinar.PersonajeAdivinado}");
-                                            }
-                                            else
-                                            {
-                                                CambiarDeTurno();
-                                            }
-                                        }
-                                        break;
-                                    case Orden.TerminarTurno:
-                                        var terminarTurno = JsonSerializer.Deserialize<TerminarTurnoCommando>(json);
-                                        if (terminarTurno != null)
-                                        {
-                                            Turno = terminarTurno.JugadorTurno;
-                                            if (Personaje != "" && Turno == Nick && terminarTurno.IntentoAdivinar == true)
-                                            {
-                                                ChatActualizado?.Invoke($"han intentado adivinar y han fallado.");
-                                                ServidorFallo?.Invoke();
-                                            }
-
-                                        }
-                                        break;
-                                    case Orden.Rechazar:
-                                        var rechazar = JsonSerializer.Deserialize<RechazarConexionCommando>(json);
-                                        if (rechazar != null)
-                                        {
-                                           MensajeError ="Nombre ya en uso";
-                                            LogActualizado?.Invoke(MensajeError);
-                                            cliente.Close();
-                                            cliente = null;
-                                            return;
-                                        }
-
-                                        break;
-                                    default:
-                                        break;
+                                    var res = respuesta.Respuesta ? "Si" : "No";
+                                    HistorialPyR.Add($"{respuesta.Quien}: {res}");
+                                    ChatActualizado?.Invoke($"{NickServer}: {res}");
+                                    CambiarDeTurno();
+                                    ServidorRespondio?.Invoke();
                                 }
-                            }
-
+                                break;
+                            case Orden.Preguntar:
+                                var pregunta = JsonSerializer.Deserialize<PreguntaCommando>(json);
+                                if (pregunta != null)
+                                {
+                                    HistorialPyR.Add($"{pregunta.Quien}: {pregunta.Pregunta}");
+                                    NickServer = pregunta.Quien;
+                                    ChatActualizado?.Invoke($"{NickServer}: {pregunta.Pregunta}");
+                                    ServidorPregunto?.Invoke();
+                                }
+                                break;
+                            case Orden.TerminarPartida:
+                                var terminarPartida = JsonSerializer.Deserialize<TerminarPartidaCommando>(json);
+                                if (terminarPartida != null)
+                                {
+                                    Turno = terminarPartida.NombreGanador;
+                                    if (terminarPartida.NombreGanador == Nick)
+                                        ClienteGano?.Invoke($"Felizidades {Nick} ganaste el personaje de {NickServer} era {terminarPartida.PersonajeJ1}");
+                                    else
+                                        ClientePerdio?.Invoke($"Lo siento Has perdido el {terminarPartida.NombreGanador} ha ganado su personaje era {terminarPartida.PersonajeJ1}");
+                                }
+                                break;
+                            case Orden.AdivinarPersonaje:
+                                var adivinar = JsonSerializer.Deserialize<AdivinarPersonajeCommando>(json);
+                                if (adivinar != null)
+                                {
+                                    if (adivinar.PersonajeAdivinado == Personaje)
+                                        ServidorGano?.Invoke($"{NickServer} ha adivinado tu personaje {adivinar.PersonajeAdivinado}");
+                                    else
+                                        CambiarDeTurno();
+                                }
+                                break;
+                            case Orden.TerminarTurno:
+                                var terminarTurno = JsonSerializer.Deserialize<TerminarTurnoCommando>(json);
+                                if (terminarTurno != null)
+                                {
+                                    Turno = terminarTurno.JugadorTurno;
+                                    if (Personaje != "" && Turno == Nick && terminarTurno.IntentoAdivinar == true)
+                                    {
+                                        ChatActualizado?.Invoke($"han intentado adivinar y han fallado.");
+                                        ServidorFallo?.Invoke();
+                                    }
+                                }
+                                break;
+                            case Orden.Rechazar:
+                                var rechazar = JsonSerializer.Deserialize<RechazarConexionCommando>(json);
+                                if (rechazar != null)
+                                {
+                                    MensajeError = "Nombre ya en uso";
+                                    LogActualizado?.Invoke(MensajeError);
+                                    cliente.Close();
+                                    cliente = null;
+                                    return;
+                                }
+                                break;
+                            default:
+                                break;
                         }
                     }
                 }
-                catch (Exception)
-                {
+            }
 
-                    throw;
-                }
+            catch (Exception ex)
+            {
+                MensajeError = ex.Message;
+                PartidaTerminada?.Invoke();
+                TerminarPartida();
+                cliente?.Close();
+                cliente = null;
+            }
+            finally
+            {
+
+                PartidaTerminada?.Invoke();                
+                TerminarPartida();                         
+                cliente?.Close();
+                cliente = null;
             }
         }
         public void ProcesarRespuesta(bool respuesta)

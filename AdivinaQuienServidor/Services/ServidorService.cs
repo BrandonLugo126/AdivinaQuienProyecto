@@ -59,7 +59,7 @@ namespace AdivinaQuienServidor.Services
         public string Pregunta { get; set; } = null!;
         public string Respuesta { get; set; } = null!;
 
-        public event Action? JugadorConectado,ClientePregunto,ClienteRespondio,ClienteIntentoAdivinar; 
+        public event Action? JugadorConectado,ClientePregunto,ClienteRespondio,ClienteIntentoAdivinar,JugadorDesconectado; 
         public event Action<string>? ChatActualizado; 
         public event Action<string>? TurnoCambiado; 
         public event Action? JuegoListoParaIniciar;
@@ -294,10 +294,11 @@ namespace AdivinaQuienServidor.Services
                     }
 
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    throw;
+                    throw new Exception(ex.Message);
                 }
+                
             }
         }
 
@@ -309,7 +310,7 @@ namespace AdivinaQuienServidor.Services
 
                 try
                 {
-                    while (true)
+                    while (cliente.Connected)
                     {
                         if (cliente.Available > 0)
                         {
@@ -371,11 +372,20 @@ namespace AdivinaQuienServidor.Services
 
                         }
                     }
+
+                    
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
 
-                    throw;
+                    throw new Exception(ex.Message);
+                }
+                finally
+                {              
+                    JugadorDesconectado?.Invoke();
+                    TerminarPatida();
+                    cliente.Close();
+                    //Servidor?.Stop();
                 }
             }
 
@@ -407,10 +417,21 @@ namespace AdivinaQuienServidor.Services
         }
         public void EnviarComando(TcpClient cliente, object comando)
         {
-            var stream = cliente.GetStream();
-            var json = JsonSerializer.Serialize(comando);
-            byte[] buffer = Encoding.UTF8.GetBytes(json);
-            stream.Write(buffer, 0, buffer.Length);
+            try
+            {
+                var stream = cliente.GetStream();
+                var json = JsonSerializer.Serialize(comando);
+                byte[] buffer = Encoding.UTF8.GetBytes(json);
+                stream.Write(buffer, 0, buffer.Length);
+            }
+            catch (Exception)
+            {
+                JugadorDesconectado?.Invoke();
+                TerminarPatida();                
+                ConexionJ2 = new();                
+
+            }
+            
         }
     }
 }
